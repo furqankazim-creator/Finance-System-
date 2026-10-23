@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import api from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
+import { useTheme } from '@/lib/theme-context';
 import {
   LedgerPage,
   LedgerHeader,
@@ -36,6 +37,7 @@ type SettingsTab = 'organization' | 'reports' | 'invoicing' | 'security' | 'syst
 
 export default function SettingsPage() {
   const { user } = useAuth();
+  const { theme, setTheme } = useTheme();
   const [activeTab, setActiveTab] = useState<SettingsTab>('organization');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -337,8 +339,64 @@ export default function SettingsPage() {
               </LedgerCard>
 
               <LedgerCard className="p-6">
-                <div className="mb-4 border-b border-slate-100 pb-3">
-                  <h2 className="text-base font-semibold text-slate-800">Contact & Physical Address</h2>
+                <div className="mb-4 border-b border-slate-100 pb-3 dark:border-slate-800">
+                  <h2 className="text-base font-semibold text-slate-800 dark:text-white">Workspace Theme & Appearance</h2>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Choose between light, dark, or system color preferences</p>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <button
+                    type="button"
+                    onClick={() => setTheme('light')}
+                    className={`flex items-center gap-3 rounded-xl border p-4 text-xs font-semibold transition-all ${
+                      theme === 'light'
+                        ? 'border-emerald-600 bg-emerald-50/70 text-emerald-800 ring-2 ring-emerald-500/20 dark:border-emerald-500 dark:bg-emerald-950/40 dark:text-emerald-300'
+                        : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900/80 dark:text-slate-300 dark:hover:bg-slate-800'
+                    }`}
+                  >
+                    <span className="text-xl">☀️</span>
+                    <div className="text-left">
+                      <p className="font-bold">Light Mode</p>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 font-normal">Clean executive alabaster</p>
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setTheme('dark')}
+                    className={`flex items-center gap-3 rounded-xl border p-4 text-xs font-semibold transition-all ${
+                      theme === 'dark'
+                        ? 'border-emerald-600 bg-emerald-50/70 text-emerald-800 ring-2 ring-emerald-500/20 dark:border-emerald-500 dark:bg-emerald-950/40 dark:text-emerald-300'
+                        : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900/80 dark:text-slate-300 dark:hover:bg-slate-800'
+                    }`}
+                  >
+                    <span className="text-xl">🌙</span>
+                    <div className="text-left">
+                      <p className="font-bold">Dark Mode</p>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 font-normal">Deep obsidian fintech slate</p>
+                    </div>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setTheme('system')}
+                    className={`flex items-center gap-3 rounded-xl border p-4 text-xs font-semibold transition-all ${
+                      theme === 'system'
+                        ? 'border-emerald-600 bg-emerald-50/70 text-emerald-800 ring-2 ring-emerald-500/20 dark:border-emerald-500 dark:bg-emerald-950/40 dark:text-emerald-300'
+                        : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900/80 dark:text-slate-300 dark:hover:bg-slate-800'
+                    }`}
+                  >
+                    <span className="text-xl">💻</span>
+                    <div className="text-left">
+                      <p className="font-bold">System Sync</p>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400 font-normal">Match OS preference</p>
+                    </div>
+                  </button>
+                </div>
+              </LedgerCard>
+
+              <LedgerCard className="p-6">
+                <div className="mb-4 border-b border-slate-100 pb-3 dark:border-slate-800">
+                  <h2 className="text-base font-semibold text-slate-800 dark:text-white">Contact & Physical Address</h2>
                   <p className="text-xs text-slate-500">Shown on official customer invoices and financial statements</p>
                 </div>
                 <div className="grid gap-4 sm:grid-cols-2">

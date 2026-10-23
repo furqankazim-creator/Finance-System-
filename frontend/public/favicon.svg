@@ -1,0 +1,19 @@
+<svg viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="tgtFavGrad" x1="0" y1="0" x2="44" y2="44" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stopColor="#10b981" />
+      <stop offset="60%" stopColor="#059669" />
+      <stop offset="100%" stopColor="#047857" />
+    </linearGradient>
+    <linearGradient id="tgtFavLintel" x1="8" y1="4" x2="36" y2="38" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stopColor="#34d399" />
+      <stop offset="100%" stopColor="#059669" />
+    </linearGradient>
+  </defs>
+  <rect x="2" y="2" width="40" height="40" rx="12" fill="url(#tgtFavGrad)" stroke="rgba(255,255,255,0.25)" stroke-width="1.5" />
+  <path d="M10 12C10 10.8954 10.8954 10 12 10H32C33.1046 10 34 10.8954 34 12V15C34 16.1046 33.1046 17 32 17H12C10.8954 17 10 16.1046 10 15V12Z" fill="url(#tgtFavLintel)" />
+  <path d="M11 19C11 18.4477 11.4477 18 12 18H16C16.5523 18 17 18.4477 17 19V31C17 32.1046 16.1046 33 15 33H12C11.4477 33 11 32.5523 11 32V19Z" fill="white" fill-opacity="0.95" />
+  <path d="M20 33L20 22C20 21.4477 20.4477 21 21 21H24C24.5523 21 25 21.4477 25 22V33H20Z" fill="white" fill-opacity="0.8" />
+  <path d="M28 33L28 18C28 17.4477 28.4477 17 29 17H32C32.5523 17 33 17.4477 33 18V30C33 31.6569 31.6569 33 30 33H28Z" fill="white" fill-opacity="0.95" />
+  <circle cx="31" cy="13.5" r="2" fill="#ecfdf5" />
+</svg>

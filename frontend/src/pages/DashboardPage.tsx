@@ -29,6 +29,7 @@ import {
   LedgerStatCard,
   LedgerTable,
 } from '@/components/app/ledger-ui';
+import { useTheme } from '@/lib/theme-context';
 import api from '@/lib/api';
 import { formatCents, formatCentsCompact } from '@/lib/money';
 import type {
@@ -100,6 +101,7 @@ function pctChange(current: number, previous: number): { note: string; tone: 'po
 }
 
 export default function DashboardPage() {
+  const { actualTheme } = useTheme();
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [breakdown, setBreakdown] = useState<IncomeExpenseBreakdown | null>(null);
   const [categories, setCategories] = useState<ExpenseCategory[]>([]);
@@ -253,30 +255,30 @@ export default function DashboardPage() {
             <LedgerCard className="p-6">
               <div className="mb-4 flex items-baseline justify-between">
                 <div>
-                  <h2 className="text-base font-bold text-slate-800">
+                  <h2 className="text-base font-bold text-slate-800 dark:text-white">
                     Chart of Accounts Snapshot
                   </h2>
-                  <p className="text-xs text-slate-500">Live operational totals from general ledger</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Live operational totals from general ledger</p>
                 </div>
-                <span className="rounded-full bg-slate-100 px-3 py-1 text-[11px] font-semibold text-slate-600">
+                <span className="rounded-full bg-slate-100 dark:bg-slate-800 px-3 py-1 text-[11px] font-semibold text-slate-600 dark:text-slate-300">
                   Bookkeeping Synced
                 </span>
               </div>
               <div className="grid gap-3 md:grid-cols-3">
-                <div className="rounded-xl border border-slate-200/80 bg-slate-50/70 p-4">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Total Assets</p>
-                  <p className="mt-1 text-xl font-bold tracking-tight text-slate-900 tabular-nums">{formatCents(accountSummary.totalAssetsCents)}</p>
+                <div className="rounded-xl border border-slate-200/80 bg-slate-50/70 p-4 dark:border-slate-800 dark:bg-slate-800/50">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Total Assets</p>
+                  <p className="mt-1 text-xl font-bold tracking-tight text-slate-900 dark:text-white tabular-nums">{formatCents(accountSummary.totalAssetsCents)}</p>
                 </div>
-                <div className="rounded-xl border border-slate-200/80 bg-slate-50/70 p-4">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Total Liabilities</p>
-                  <p className="mt-1 text-xl font-bold tracking-tight text-rose-700 tabular-nums">{formatCents(accountSummary.totalLiabilitiesCents)}</p>
+                <div className="rounded-xl border border-slate-200/80 bg-slate-50/70 p-4 dark:border-slate-800 dark:bg-slate-800/50">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Total Liabilities</p>
+                  <p className="mt-1 text-xl font-bold tracking-tight text-rose-700 dark:text-rose-400 tabular-nums">{formatCents(accountSummary.totalLiabilitiesCents)}</p>
                 </div>
-                <div className="rounded-xl border border-slate-200/80 bg-slate-50/70 p-4">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Total Capital / Equity</p>
-                  <p className="mt-1 text-xl font-bold tracking-tight text-emerald-700 tabular-nums">{formatCents(accountSummary.totalEquityCents)}</p>
+                <div className="rounded-xl border border-slate-200/80 bg-slate-50/70 p-4 dark:border-slate-800 dark:bg-slate-800/50">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">Total Capital / Equity</p>
+                  <p className="mt-1 text-xl font-bold tracking-tight text-emerald-700 dark:text-emerald-400 tabular-nums">{formatCents(accountSummary.totalEquityCents)}</p>
                 </div>
               </div>
-              <p className="mt-3 text-[11px] text-slate-500">
+              <p className="mt-3 text-[11px] text-slate-500 dark:text-slate-400">
                 Reflects transactions recorded on the Bookkeeping ledger — capital, loans, and assets tagged to a chart-of-accounts balance.
               </p>
             </LedgerCard>
@@ -286,12 +288,12 @@ export default function DashboardPage() {
             <LedgerCard className="p-6">
               <div className="mb-4 flex items-start justify-between gap-4">
                 <div>
-                  <h2 className="text-base font-bold text-slate-800">
+                  <h2 className="text-base font-bold text-slate-800 dark:text-white">
                     Income vs Expense
                   </h2>
-                  <p className="text-xs text-slate-500">Trailing 12 months financial trajectory</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">Trailing 12 months financial trajectory</p>
                 </div>
-                <span className="rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-semibold text-emerald-700 border border-emerald-200/50">
+                <span className="rounded-full bg-emerald-50 dark:bg-emerald-950/40 px-3 py-1 text-[11px] font-semibold text-emerald-700 dark:text-emerald-400 border border-emerald-200/50 dark:border-emerald-800/50">
                   Monthly Performance
                 </span>
               </div>
@@ -309,19 +311,19 @@ export default function DashboardPage() {
                         <stop offset="100%" stopColor="#d97706" />
                       </linearGradient>
                     </defs>
-                    <CartesianGrid vertical={false} stroke="#f1f5f9" strokeDasharray="3 3" />
+                    <CartesianGrid vertical={false} stroke={actualTheme === 'dark' ? '#1e293b' : '#f1f5f9'} strokeDasharray="3 3" />
                     <XAxis
                       dataKey="month"
                       axisLine={false}
                       tickLine={false}
-                      tick={{ fill: '#64748b', fontSize: 11, fontWeight: 500 }}
+                      tick={{ fill: actualTheme === 'dark' ? '#94a3b8' : '#64748b', fontSize: 11, fontWeight: 500 }}
                     />
                     <YAxis
                       axisLine={false}
                       tickLine={false}
                       tickMargin={8}
                       tickFormatter={(v) => formatCentsCompact(v)}
-                      tick={{ fill: '#64748b', fontSize: 11, fontWeight: 500 }}
+                      tick={{ fill: actualTheme === 'dark' ? '#94a3b8' : '#64748b', fontSize: 11, fontWeight: 500 }}
                     />
                     <Tooltip content={<CustomChartTooltip />} />
                     <Bar dataKey="incomeCents" fill="url(#incomeBarGrad)" radius={[6, 6, 0, 0]} maxBarSize={30} />
@@ -329,11 +331,11 @@ export default function DashboardPage() {
                   </BarChart>
                 </ResponsiveContainer>
               </div>
-              <div className="mt-3 flex items-center justify-center gap-6 border-t border-slate-100 pt-3">
-                <span className="inline-flex items-center gap-2 text-xs font-semibold text-slate-600">
+              <div className="mt-3 flex items-center justify-center gap-6 border-t border-slate-100 dark:border-slate-800 pt-3">
+                <span className="inline-flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-400">
                   <span className="inline-block h-3 w-3 rounded-md bg-emerald-600 shadow-sm shadow-emerald-600/30" /> Income
                 </span>
-                <span className="inline-flex items-center gap-2 text-xs font-semibold text-slate-600">
+                <span className="inline-flex items-center gap-2 text-xs font-semibold text-slate-600 dark:text-slate-400">
                   <span className="inline-block h-3 w-3 rounded-md bg-amber-500 shadow-sm shadow-amber-500/30" /> Expense
                 </span>
               </div>
@@ -341,14 +343,14 @@ export default function DashboardPage() {
 
             <LedgerCard className="p-6 flex flex-col justify-between">
               <div>
-                <div className="mb-4 flex items-center gap-2 border-b border-slate-100 pb-3">
+                <div className="mb-4 flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
                   <button
                     type="button"
                     onClick={() => setDonutView('income')}
                     className={`rounded-xl px-3 py-1.5 text-xs font-bold transition-all ${
                       donutView === 'income'
                         ? 'bg-emerald-600 text-white shadow-sm'
-                        : 'text-slate-600 hover:bg-slate-100'
+                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                     }`}
                   >
                     Top Revenue
@@ -359,7 +361,7 @@ export default function DashboardPage() {
                     className={`rounded-xl px-3 py-1.5 text-xs font-bold transition-all ${
                       donutView === 'expense'
                         ? 'bg-emerald-600 text-white shadow-sm'
-                        : 'text-slate-600 hover:bg-slate-100'
+                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                     }`}
                   >
                     Top Spend
@@ -367,7 +369,7 @@ export default function DashboardPage() {
                 </div>
 
                 {donutData.length === 0 ? (
-                  <p className="mt-8 text-center text-xs text-slate-400">
+                  <p className="mt-8 text-center text-xs text-slate-400 dark:text-slate-500">
                     No {donutView} recorded in the last 12 months yet.
                   </p>
                 ) : (
@@ -394,14 +396,14 @@ export default function DashboardPage() {
                     <div className="mt-4 space-y-2">
                       {donutData.map((entry, index) => (
                         <div key={entry.name} className="flex items-center justify-between gap-3 text-xs">
-                          <span className="inline-flex items-center gap-2 text-slate-600 font-medium truncate max-w-[150px]">
+                          <span className="inline-flex items-center gap-2 text-slate-600 dark:text-slate-400 font-medium truncate max-w-[150px]">
                             <span
                               className="inline-block h-2.5 w-2.5 shrink-0 rounded-full"
                               style={{ backgroundColor: DONUT_COLORS[index % DONUT_COLORS.length] }}
                             />
                             {entry.name}
                           </span>
-                          <span className="font-bold text-slate-900 tabular-nums">
+                          <span className="font-bold text-slate-900 dark:text-white tabular-nums">
                             {donutTotalCents > 0 ? Math.round((entry.totalCents / donutTotalCents) * 100) : 0}%
                           </span>
                         </div>

@@ -42,10 +42,10 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950">
         <div className="flex flex-col items-center gap-3">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600" />
-          <p className="text-xs font-semibold text-slate-500">Loading your workspace...</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600 dark:border-emerald-400" />
+          <p className="text-xs font-semibold text-slate-500 dark:text-slate-400">Loading your workspace...</p>
         </div>
       </div>
     );
@@ -60,7 +60,7 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <ProtectedRoute>
-      <div className="flex min-h-screen bg-slate-50 text-slate-900 font-sans">
+      <div className="flex min-h-screen bg-slate-50 text-slate-900 font-sans transition-colors dark:bg-slate-950 dark:text-slate-100">
         <Sidebar />
         <div className="flex-1 min-w-0">
           <Header />

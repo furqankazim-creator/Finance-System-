@@ -28,6 +28,7 @@ import {
   LedgerTable,
   LedgerTextarea,
 } from '@/components/app/ledger-ui';
+import { useTheme } from '@/lib/theme-context';
 import api from '@/lib/api';
 import { formatCents, formatCentsCompact } from '@/lib/money';
 import type { PLReport, Project, ExecutiveReportData } from '@/lib/types';
@@ -68,6 +69,7 @@ function weekOptionsForRecent() {
 }
 
 export default function ReportsPage() {
+  const { actualTheme } = useTheme();
   const monthOptions = useMemo(() => monthOptionsForLastYear(), []);
   const weekOptions = useMemo(() => weekOptionsForRecent(), []);
 
@@ -384,16 +386,13 @@ export default function ReportsPage() {
               {/* Working Capital & Operational Position */}
               <div className="grid gap-4 md:grid-cols-2">
                 {/* Receivables Card */}
-                <LedgerCard className="p-5">
-                  <div className="flex items-center justify-between border-b border-[#e5dfd3] pb-3">
+                <LedgerCard className="p-6">
+                  <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
                     <div>
-                      <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#8b8f85]">
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                         ACCOUNTS RECEIVABLE
                       </p>
-                      <p
-                        className="mt-1 text-[20px] font-bold text-[#1f352c]"
-                        style={{ fontFamily: 'Georgia, serif' }}
-                      >
+                      <p className="mt-1 text-2xl font-bold tracking-tight text-slate-900 dark:text-white tabular-nums">
                         {formatCents(execData.receivables.totalCents, execData.currency)}
                       </p>
                     </div>
@@ -402,24 +401,24 @@ export default function ReportsPage() {
                     </LedgerBadge>
                   </div>
 
-                  <div className="mt-4 space-y-2.5 text-[12.5px]">
-                    <div className="flex justify-between text-[#49544d]">
+                  <div className="mt-4 space-y-2.5 text-xs">
+                    <div className="flex justify-between text-slate-600 dark:text-slate-400">
                       <span>Overdue from Clients</span>
-                      <span className="font-semibold text-[#c2555f]">
+                      <span className="font-semibold text-rose-600 dark:text-rose-400 tabular-nums">
                         {formatCents(execData.receivables.overdueCents, execData.currency)} (
                         {execData.receivables.overdueCount} invoices)
                       </span>
                     </div>
-                    <div className="flex justify-between text-[#49544d]">
+                    <div className="flex justify-between text-slate-600 dark:text-slate-400">
                       <span>Invoices Billed this period</span>
-                      <span className="font-medium">
+                      <span className="font-medium text-slate-800 dark:text-slate-200 tabular-nums">
                         {formatCents(execData.invoicesBilledTotalCents, execData.currency)} (
                         {execData.invoicesBilledCount} billed)
                       </span>
                     </div>
-                    <div className="flex justify-between text-[#49544d]">
+                    <div className="flex justify-between text-slate-600 dark:text-slate-400">
                       <span>Expected Collection Status</span>
-                      <span className="text-[#2c9a74]">
+                      <span className="font-semibold text-emerald-600 dark:text-emerald-400">
                         {execData.receivables.overdueCount === 0
                           ? 'Healthy · All on schedule'
                           : 'Attention needed on overdue'}
@@ -429,42 +428,39 @@ export default function ReportsPage() {
                 </LedgerCard>
 
                 {/* Payables Card */}
-                <LedgerCard className="p-5">
-                  <div className="flex items-center justify-between border-b border-[#e5dfd3] pb-3">
+                <LedgerCard className="p-6">
+                  <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
                     <div>
-                      <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-[#8b8f85]">
+                      <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                         ACCOUNTS PAYABLE & LIABILITIES
                       </p>
-                      <p
-                        className="mt-1 text-[20px] font-bold text-[#1f352c]"
-                        style={{ fontFamily: 'Georgia, serif' }}
-                      >
+                      <p className="mt-1 text-2xl font-bold tracking-tight text-slate-900 dark:text-white tabular-nums">
                         {formatCents(execData.payables.totalCents, execData.currency)}
                       </p>
                     </div>
                     <LedgerBadge tone="neutral">Upcoming obligations</LedgerBadge>
                   </div>
 
-                  <div className="mt-4 space-y-2.5 text-[12.5px]">
-                    <div className="flex justify-between text-[#49544d]">
+                  <div className="mt-4 space-y-2.5 text-xs">
+                    <div className="flex justify-between text-slate-600 dark:text-slate-400">
                       <span>Pending Staff Salaries</span>
-                      <span className="font-semibold text-[#31443c]">
+                      <span className="font-semibold text-slate-800 dark:text-slate-200 tabular-nums">
                         {formatCents(execData.payables.pendingPayrollCents, execData.currency)}
                       </span>
                     </div>
-                    <div className="flex justify-between text-[#49544d]">
+                    <div className="flex justify-between text-slate-600 dark:text-slate-400">
                       <span>Active Bank Loans & Debt</span>
-                      <span className="font-semibold text-[#31443c]">
+                      <span className="font-semibold text-slate-800 dark:text-slate-200 tabular-nums">
                         {formatCents(execData.payables.openLoansCents, execData.currency)}
                       </span>
                     </div>
-                    <div className="flex justify-between text-[#49544d]">
+                    <div className="flex justify-between text-slate-600 dark:text-slate-400">
                       <span>Liquidity Coverage Ratio</span>
                       <span
                         className={
                           execData.cashInBankCents >= execData.payables.totalCents
-                            ? 'font-medium text-[#2c9a74]'
-                            : 'font-medium text-[#c2555f]'
+                            ? 'font-semibold text-emerald-600 dark:text-emerald-400'
+                            : 'font-semibold text-rose-600 dark:text-rose-400'
                         }
                       >
                         {execData.payables.totalCents > 0
@@ -480,7 +476,7 @@ export default function ReportsPage() {
               </div>
 
               {/* Top Expense Drivers Table */}
-              <div className="rounded-[10px] border border-[#d8d2c7] bg-[#fbfaf6]">
+              <LedgerCard className="p-0 overflow-hidden">
                 <LedgerSectionTitle>
                   Top Spending Drivers · {execData.periodLabel}
                 </LedgerSectionTitle>
@@ -495,23 +491,23 @@ export default function ReportsPage() {
                         <LedgerCell strong>{c.categoryName}</LedgerCell>
                         <LedgerCell>
                           <div className="flex items-center gap-3">
-                            <div className="h-2 w-28 overflow-hidden rounded-full bg-[#e8e2d5]">
+                            <div className="h-2 w-28 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
                               <div
-                                className="h-full rounded-full bg-[#0b6b48]"
+                                className="h-full rounded-full bg-emerald-600 dark:bg-emerald-500"
                                 style={{ width: `${Math.min(100, c.percentage)}%` }}
                               />
                             </div>
-                            <span className="text-[11px] text-[#787d75]">{c.percentage}%</span>
+                            <span className="text-[11px] text-slate-500 dark:text-slate-400">{c.percentage}%</span>
                           </div>
                         </LedgerCell>
-                        <LedgerCell className="font-semibold text-[#31443c]">
+                        <LedgerCell className="font-semibold text-slate-800 dark:text-slate-200 tabular-nums">
                           {formatCents(c.totalCents, execData.currency)}
                         </LedgerCell>
                       </LedgerRow>
                     ))
                   )}
                 </LedgerTable>
-              </div>
+              </LedgerCard>
             </div>
           )}
         </>
@@ -551,11 +547,11 @@ export default function ReportsPage() {
                 />
               </section>
 
-              <section className="rounded-[10px] border border-[#d8d2c7] bg-[#fbfaf6]">
+              <LedgerCard className="p-0 overflow-hidden">
                 <LedgerSectionTitle>By category · this period</LedgerSectionTitle>
-                <div className="px-4 py-5">
+                <div className="px-5 py-5">
                   {categoryRows.length === 0 ? (
-                    <p className="text-[12px] text-[#8b8f85]">
+                    <p className="text-xs text-slate-400 dark:text-slate-500">
                       No categorized expenses in this period.
                     </p>
                   ) : (
@@ -567,13 +563,13 @@ export default function ReportsPage() {
                           margin={{ top: 6, right: 16, left: 18, bottom: 8 }}
                           barCategoryGap={16}
                         >
-                          <CartesianGrid stroke="#ddd8cd" strokeDasharray="3 3" horizontal={false} />
+                          <CartesianGrid stroke={actualTheme === 'dark' ? '#1e293b' : '#f1f5f9'} strokeDasharray="3 3" horizontal={false} />
                           <XAxis
                             type="number"
                             axisLine={false}
                             tickLine={false}
                             tickMargin={8}
-                            tick={{ fill: '#6d746d', fontSize: 11 }}
+                            tick={{ fill: actualTheme === 'dark' ? '#94a3b8' : '#64748b', fontSize: 11 }}
                             tickFormatter={(v) => formatCentsCompact(v)}
                           />
                           <YAxis
@@ -582,11 +578,11 @@ export default function ReportsPage() {
                             width={130}
                             axisLine={false}
                             tickLine={false}
-                            tick={{ fill: '#6d746d', fontSize: 11 }}
+                            tick={{ fill: actualTheme === 'dark' ? '#94a3b8' : '#64748b', fontSize: 11 }}
                           />
-                          <Bar dataKey="totalCents" radius={[0, 4, 4, 0]} barSize={14}>
+                          <Bar dataKey="totalCents" radius={[0, 6, 6, 0]} barSize={16}>
                             {categoryRows.map((row) => (
-                              <Cell key={row.categoryName} fill={row.color || '#0b5f43'} />
+                              <Cell key={row.categoryName} fill={row.color || '#059669'} />
                             ))}
                           </Bar>
                         </BarChart>
@@ -594,7 +590,7 @@ export default function ReportsPage() {
                     </div>
                   )}
                 </div>
-              </section>
+              </LedgerCard>
 
               <section>
                 <div className="mb-2 text-[11px] text-[#787d75]">Category detail</div>
