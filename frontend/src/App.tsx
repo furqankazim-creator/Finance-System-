@@ -27,6 +27,7 @@ import PayablesReceivablesPage from '@/pages/PayablesReceivablesPage';
 import CostingPage from '@/pages/CostingPage';
 import BankStatementPage from '@/pages/BankStatementPage';
 import PaymentsPage from '@/pages/PaymentsPage';
+import SettingsPage from '@/pages/SettingsPage';
 
 // Protected route wrapper
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
@@ -41,8 +42,11 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+      <div className="min-h-screen flex items-center justify-center bg-slate-50">
+        <div className="flex flex-col items-center gap-3">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600" />
+          <p className="text-xs font-semibold text-slate-500">Loading your workspace...</p>
+        </div>
       </div>
     );
   }
@@ -56,11 +60,11 @@ function ProtectedRoute({ children }: { children: React.ReactNode }) {
 function DashboardLayout({ children }: { children: React.ReactNode }) {
   return (
     <ProtectedRoute>
-      <div className="flex min-h-screen bg-[#f4f1e8] text-[#21352d]">
+      <div className="flex min-h-screen bg-slate-50 text-slate-900 font-sans">
         <Sidebar />
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <Header />
-          <main className="min-h-screen px-5 py-5 lg:px-6">{children}</main>
+          <main className="min-h-screen px-6 py-6 lg:px-8 max-w-[1400px]">{children}</main>
         </div>
       </div>
     </ProtectedRoute>
@@ -83,8 +87,11 @@ function RootRedirect() {
   }, [user, loading, navigate]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+    <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="flex flex-col items-center gap-3">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-600" />
+        <p className="text-xs font-semibold text-slate-500">Connecting to TGT Finance...</p>
+      </div>
     </div>
   );
 }
@@ -101,23 +108,129 @@ function App() {
       <Route path="/forgot-password" element={<ForgotPasswordPage />} />
       <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
 
-      {/* Dashboard routes */}
-      <Route path="/dashboard" element={<DashboardLayout><DashboardPage /></DashboardLayout>} />
-      <Route path="/clients" element={<DashboardLayout><ClientsPage /></DashboardLayout>} />
-      <Route path="/projects" element={<DashboardLayout><ProjectsPage /></DashboardLayout>} />
-      <Route path="/categories" element={<DashboardLayout><CategoriesPage /></DashboardLayout>} />
-      <Route path="/expenses" element={<DashboardLayout><ExpensesPage /></DashboardLayout>} />
-      <Route path="/invoices" element={<DashboardLayout><InvoicesPage /></DashboardLayout>} />
-      <Route path="/reports" element={<DashboardLayout><ReportsPage /></DashboardLayout>} />
-      <Route path="/payroll" element={<DashboardLayout><PayrollPage /></DashboardLayout>} />
-      <Route path="/chart-of-accounts" element={<DashboardLayout><ChartOfAccountsPage /></DashboardLayout>} />
-      <Route path="/bookkeeping" element={<DashboardLayout><BookkeepingPage /></DashboardLayout>} />
-      <Route path="/payables-receivables" element={<DashboardLayout><PayablesReceivablesPage /></DashboardLayout>} />
-      <Route path="/costing" element={<DashboardLayout><CostingPage /></DashboardLayout>} />
-      <Route path="/bank-statement" element={<DashboardLayout><BankStatementPage /></DashboardLayout>} />
-      <Route path="/payments" element={<DashboardLayout><PaymentsPage /></DashboardLayout>} />
+      {/* Protected dashboard routes */}
+      <Route
+        path="/dashboard"
+        element={
+          <DashboardLayout>
+            <DashboardPage />
+          </DashboardLayout>
+        }
+      />
+      <Route
+        path="/reports"
+        element={
+          <DashboardLayout>
+            <ReportsPage />
+          </DashboardLayout>
+        }
+      />
+      <Route
+        path="/invoices"
+        element={
+          <DashboardLayout>
+            <InvoicesPage />
+          </DashboardLayout>
+        }
+      />
+      <Route
+        path="/expenses"
+        element={
+          <DashboardLayout>
+            <ExpensesPage />
+          </DashboardLayout>
+        }
+      />
+      <Route
+        path="/clients"
+        element={
+          <DashboardLayout>
+            <ClientsPage />
+          </DashboardLayout>
+        }
+      />
+      <Route
+        path="/projects"
+        element={
+          <DashboardLayout>
+            <ProjectsPage />
+          </DashboardLayout>
+        }
+      />
+      <Route
+        path="/categories"
+        element={
+          <DashboardLayout>
+            <CategoriesPage />
+          </DashboardLayout>
+        }
+      />
+      <Route
+        path="/payroll"
+        element={
+          <DashboardLayout>
+            <PayrollPage />
+          </DashboardLayout>
+        }
+      />
+      <Route
+        path="/chart-of-accounts"
+        element={
+          <DashboardLayout>
+            <ChartOfAccountsPage />
+          </DashboardLayout>
+        }
+      />
+      <Route
+        path="/bookkeeping"
+        element={
+          <DashboardLayout>
+            <BookkeepingPage />
+          </DashboardLayout>
+        }
+      />
+      <Route
+        path="/payables-receivables"
+        element={
+          <DashboardLayout>
+            <PayablesReceivablesPage />
+          </DashboardLayout>
+        }
+      />
+      <Route
+        path="/bank-statement"
+        element={
+          <DashboardLayout>
+            <BankStatementPage />
+          </DashboardLayout>
+        }
+      />
+      <Route
+        path="/payments"
+        element={
+          <DashboardLayout>
+            <PaymentsPage />
+          </DashboardLayout>
+        }
+      />
+      <Route
+        path="/costing"
+        element={
+          <DashboardLayout>
+            <CostingPage />
+          </DashboardLayout>
+        }
+      />
+      <Route
+        path="/settings"
+        element={
+          <DashboardLayout>
+            <SettingsPage />
+          </DashboardLayout>
+        }
+      />
 
-      {/* Catch all - redirect to root */}
+      {/* Catch-all redirect */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

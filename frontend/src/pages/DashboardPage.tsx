@@ -7,6 +7,7 @@ import {
   Pie,
   PieChart,
   ResponsiveContainer,
+  Tooltip,
   XAxis,
   YAxis,
 } from 'recharts';
@@ -39,7 +40,31 @@ import type {
   PayablesReceivables,
 } from '@/lib/types';
 
-const DONUT_COLORS = ['#0d6847', '#d98f3d', '#4a7fa6', '#8f7a2f', '#ba676f'];
+const DONUT_COLORS = ['#059669', '#3b82f6', '#8b5cf6', '#f59e0b', '#ec4899', '#06b6d4'];
+
+function CustomChartTooltip({ active, payload, label }: any) {
+  if (active && payload && payload.length) {
+    return (
+      <div className="rounded-xl border border-slate-700/80 bg-slate-900/95 p-3 text-xs text-white shadow-xl backdrop-blur-md">
+        <p className="font-semibold text-slate-300">{label}</p>
+        <div className="mt-1.5 space-y-1">
+          {payload.map((p: any) => (
+            <div key={p.name || p.dataKey} className="flex items-center justify-between gap-4">
+              <span className="flex items-center gap-1.5 text-slate-400">
+                <span className="h-2 w-2 rounded-full" style={{ backgroundColor: p.color || p.fill }} />
+                {p.dataKey === 'incomeCents' ? 'Income' : p.dataKey === 'expenseCents' ? 'Expense' : p.name}
+              </span>
+              <span className="font-semibold text-white tabular-nums">
+                {formatCents(p.value)}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+  return null;
+}
 
 type TxType = 'expense' | 'invoice';
 
@@ -225,151 +250,166 @@ export default function DashboardPage() {
           )}
 
           {accountSummary && (
-            <section className="rounded-[10px] border border-[#d8d2c7] bg-[#fbfaf6] p-5">
-              <div className="mb-3 flex items-baseline justify-between">
-                <h2 className="text-[16px] font-normal text-[#243830]" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
-                  Chart of Accounts snapshot
-                </h2>
-                <p className="text-[11px] text-[#72776f]">From Bookkeeping entries</p>
+            <LedgerCard className="p-6">
+              <div className="mb-4 flex items-baseline justify-between">
+                <div>
+                  <h2 className="text-base font-bold text-slate-800">
+                    Chart of Accounts Snapshot
+                  </h2>
+                  <p className="text-xs text-slate-500">Live operational totals from general ledger</p>
+                </div>
+                <span className="rounded-full bg-slate-100 px-3 py-1 text-[11px] font-semibold text-slate-600">
+                  Bookkeeping Synced
+                </span>
               </div>
               <div className="grid gap-3 md:grid-cols-3">
-                <div className="rounded-[8px] bg-[#f6f4ec] px-3 py-2.5">
-                  <p className="text-[9px] font-semibold uppercase tracking-[0.1em] text-[#909388]">Total assets</p>
-                  <p className="mt-1 text-[18px] font-semibold text-[#20352d]">{formatCents(accountSummary.totalAssetsCents)}</p>
+                <div className="rounded-xl border border-slate-200/80 bg-slate-50/70 p-4">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Total Assets</p>
+                  <p className="mt-1 text-xl font-bold tracking-tight text-slate-900 tabular-nums">{formatCents(accountSummary.totalAssetsCents)}</p>
                 </div>
-                <div className="rounded-[8px] bg-[#f6f4ec] px-3 py-2.5">
-                  <p className="text-[9px] font-semibold uppercase tracking-[0.1em] text-[#909388]">Total liabilities</p>
-                  <p className="mt-1 text-[18px] font-semibold text-[#20352d]">{formatCents(accountSummary.totalLiabilitiesCents)}</p>
+                <div className="rounded-xl border border-slate-200/80 bg-slate-50/70 p-4">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Total Liabilities</p>
+                  <p className="mt-1 text-xl font-bold tracking-tight text-rose-700 tabular-nums">{formatCents(accountSummary.totalLiabilitiesCents)}</p>
                 </div>
-                <div className="rounded-[8px] bg-[#f6f4ec] px-3 py-2.5">
-                  <p className="text-[9px] font-semibold uppercase tracking-[0.1em] text-[#909388]">Total capital / equity</p>
-                  <p className="mt-1 text-[18px] font-semibold text-[#20352d]">{formatCents(accountSummary.totalEquityCents)}</p>
+                <div className="rounded-xl border border-slate-200/80 bg-slate-50/70 p-4">
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-500">Total Capital / Equity</p>
+                  <p className="mt-1 text-xl font-bold tracking-tight text-emerald-700 tabular-nums">{formatCents(accountSummary.totalEquityCents)}</p>
                 </div>
               </div>
-              <p className="mt-3 text-[10px] text-[#8b8f85]">
-                Reflects transactions recorded on the Bookkeeping page — capital, loans, and assets tagged to a chart-of-accounts account. Everyday expenses/invoices logged elsewhere aren't required to be tagged, so this is a snapshot of what's been recorded there, not a full balance sheet.
+              <p className="mt-3 text-[11px] text-slate-500">
+                Reflects transactions recorded on the Bookkeeping ledger — capital, loans, and assets tagged to a chart-of-accounts balance.
               </p>
-            </section>
+            </LedgerCard>
           )}
 
-          <section className="grid gap-4 xl:grid-cols-[2.15fr_1fr]">
-            <LedgerCard className="p-5">
+          <section className="grid gap-5 xl:grid-cols-[2.15fr_1fr]">
+            <LedgerCard className="p-6">
               <div className="mb-4 flex items-start justify-between gap-4">
-                <h2
-                  className="text-[16px] font-normal text-[#243830]"
-                  style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
-                >
-                  Income vs Expense
-                </h2>
-                <p className="text-[11px] text-[#72776f]">last 12 months</p>
+                <div>
+                  <h2 className="text-base font-bold text-slate-800">
+                    Income vs Expense
+                  </h2>
+                  <p className="text-xs text-slate-500">Trailing 12 months financial trajectory</p>
+                </div>
+                <span className="rounded-full bg-emerald-50 px-3 py-1 text-[11px] font-semibold text-emerald-700 border border-emerald-200/50">
+                  Monthly Performance
+                </span>
               </div>
 
-              <div className="h-[300px]">
+              <div className="h-[310px]">
                 <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={breakdown.monthly} margin={{ top: 6, right: 12, left: 4, bottom: 0 }} barGap={6}>
-                    <CartesianGrid vertical={false} stroke="#ddd8cd" strokeDasharray="3 3" />
+                  <BarChart data={breakdown.monthly} margin={{ top: 8, right: 12, left: 4, bottom: 0 }} barGap={6}>
+                    <defs>
+                      <linearGradient id="incomeBarGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#10b981" />
+                        <stop offset="100%" stopColor="#059669" />
+                      </linearGradient>
+                      <linearGradient id="expenseBarGrad" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#f59e0b" />
+                        <stop offset="100%" stopColor="#d97706" />
+                      </linearGradient>
+                    </defs>
+                    <CartesianGrid vertical={false} stroke="#f1f5f9" strokeDasharray="3 3" />
                     <XAxis
                       dataKey="month"
                       axisLine={false}
                       tickLine={false}
-                      tick={{ fill: '#687068', fontSize: 11 }}
+                      tick={{ fill: '#64748b', fontSize: 11, fontWeight: 500 }}
                     />
                     <YAxis
                       axisLine={false}
                       tickLine={false}
                       tickMargin={8}
                       tickFormatter={(v) => formatCentsCompact(v)}
-                      tick={{ fill: '#687068', fontSize: 11 }}
+                      tick={{ fill: '#64748b', fontSize: 11, fontWeight: 500 }}
                     />
-                    <Bar dataKey="incomeCents" radius={[3, 3, 0, 0]} maxBarSize={28}>
-                      {breakdown.monthly.map((entry) => (
-                        <Cell key={`inc-${entry.month}`} fill={entry.incomeCents > 0 ? '#0b5f43' : 'rgba(11,95,67,0)'} />
-                      ))}
-                    </Bar>
-                    <Bar dataKey="expenseCents" radius={[3, 3, 0, 0]} maxBarSize={28}>
-                      {breakdown.monthly.map((entry) => (
-                        <Cell key={`exp-${entry.month}`} fill={entry.expenseCents > 0 ? '#d98f3d' : 'rgba(217,143,61,0)'} />
-                      ))}
-                    </Bar>
+                    <Tooltip content={<CustomChartTooltip />} />
+                    <Bar dataKey="incomeCents" fill="url(#incomeBarGrad)" radius={[6, 6, 0, 0]} maxBarSize={30} />
+                    <Bar dataKey="expenseCents" fill="url(#expenseBarGrad)" radius={[6, 6, 0, 0]} maxBarSize={30} />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
-              <div className="mt-2 flex items-center justify-center gap-5">
-                <span className="inline-flex items-center gap-1.5 text-[10px] text-[#6f766e]">
-                  <span className="inline-block h-2.5 w-2.5 rounded-[1px] bg-[#0b5f43]" /> Income
+              <div className="mt-3 flex items-center justify-center gap-6 border-t border-slate-100 pt-3">
+                <span className="inline-flex items-center gap-2 text-xs font-semibold text-slate-600">
+                  <span className="inline-block h-3 w-3 rounded-md bg-emerald-600 shadow-sm shadow-emerald-600/30" /> Income
                 </span>
-                <span className="inline-flex items-center gap-1.5 text-[10px] text-[#6f766e]">
-                  <span className="inline-block h-2.5 w-2.5 rounded-[1px] bg-[#d98f3d]" /> Expense
+                <span className="inline-flex items-center gap-2 text-xs font-semibold text-slate-600">
+                  <span className="inline-block h-3 w-3 rounded-md bg-amber-500 shadow-sm shadow-amber-500/30" /> Expense
                 </span>
               </div>
             </LedgerCard>
 
-            <LedgerCard className="p-5">
-              <div className="mb-3 flex items-center gap-4">
-                <button
-                  type="button"
-                  onClick={() => setDonutView('income')}
-                  className={`text-[14px] font-normal ${donutView === 'income' ? 'text-[#0d6847]' : 'text-[#8b8f85]'}`}
-                  style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
-                >
-                  Top 5 Income
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setDonutView('expense')}
-                  className={`text-[14px] font-normal ${donutView === 'expense' ? 'text-[#0d6847]' : 'text-[#8b8f85]'}`}
-                  style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
-                >
-                  Expense
-                </button>
-              </div>
-              <div
-                className="h-[2px] w-6 rounded-full bg-[#0d6847] transition-transform"
-                style={{ transform: donutView === 'expense' ? 'translateX(88px)' : 'translateX(0)' }}
-              />
+            <LedgerCard className="p-6 flex flex-col justify-between">
+              <div>
+                <div className="mb-4 flex items-center gap-2 border-b border-slate-100 pb-3">
+                  <button
+                    type="button"
+                    onClick={() => setDonutView('income')}
+                    className={`rounded-xl px-3 py-1.5 text-xs font-bold transition-all ${
+                      donutView === 'income'
+                        ? 'bg-emerald-600 text-white shadow-sm'
+                        : 'text-slate-600 hover:bg-slate-100'
+                    }`}
+                  >
+                    Top Revenue
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setDonutView('expense')}
+                    className={`rounded-xl px-3 py-1.5 text-xs font-bold transition-all ${
+                      donutView === 'expense'
+                        ? 'bg-emerald-600 text-white shadow-sm'
+                        : 'text-slate-600 hover:bg-slate-100'
+                    }`}
+                  >
+                    Top Spend
+                  </button>
+                </div>
 
-              {donutData.length === 0 ? (
-                <p className="mt-8 text-[12px] text-[#8b8f85]">
-                  No {donutView} recorded in the last 12 months yet.
-                </p>
-              ) : (
-                <>
-                  <div className="h-[190px]">
-                    <ResponsiveContainer width="100%" height="100%">
-                      <PieChart>
-                        <Pie
-                          data={donutData}
-                          dataKey="totalCents"
-                          nameKey="name"
-                          innerRadius={48}
-                          outerRadius={72}
-                          paddingAngle={2}
-                        >
-                          {donutData.map((entry, index) => (
-                            <Cell key={entry.name} fill={DONUT_COLORS[index % DONUT_COLORS.length]} />
-                          ))}
-                        </Pie>
-                      </PieChart>
-                    </ResponsiveContainer>
-                  </div>
-                  <div className="mt-2 space-y-1.5">
-                    {donutData.map((entry, index) => (
-                      <div key={entry.name} className="flex items-center justify-between gap-3 text-[11px]">
-                        <span className="inline-flex items-center gap-1.5 text-[#46534c]">
-                          <span
-                            className="inline-block h-2 w-2 rounded-full"
-                            style={{ backgroundColor: DONUT_COLORS[index % DONUT_COLORS.length] }}
-                          />
-                          {entry.name}
-                        </span>
-                        <span className="font-semibold text-[#20352d]">
-                          {donutTotalCents > 0 ? Math.round((entry.totalCents / donutTotalCents) * 100) : 0}%
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </>
-              )}
+                {donutData.length === 0 ? (
+                  <p className="mt-8 text-center text-xs text-slate-400">
+                    No {donutView} recorded in the last 12 months yet.
+                  </p>
+                ) : (
+                  <>
+                    <div className="h-[180px]">
+                      <ResponsiveContainer width="100%" height="100%">
+                        <PieChart>
+                          <Pie
+                            data={donutData}
+                            dataKey="totalCents"
+                            nameKey="name"
+                            innerRadius={50}
+                            outerRadius={75}
+                            paddingAngle={3}
+                          >
+                            {donutData.map((entry, index) => (
+                              <Cell key={entry.name} fill={DONUT_COLORS[index % DONUT_COLORS.length]} />
+                            ))}
+                          </Pie>
+                          <Tooltip content={<CustomChartTooltip />} />
+                        </PieChart>
+                      </ResponsiveContainer>
+                    </div>
+                    <div className="mt-4 space-y-2">
+                      {donutData.map((entry, index) => (
+                        <div key={entry.name} className="flex items-center justify-between gap-3 text-xs">
+                          <span className="inline-flex items-center gap-2 text-slate-600 font-medium truncate max-w-[150px]">
+                            <span
+                              className="inline-block h-2.5 w-2.5 shrink-0 rounded-full"
+                              style={{ backgroundColor: DONUT_COLORS[index % DONUT_COLORS.length] }}
+                            />
+                            {entry.name}
+                          </span>
+                          <span className="font-bold text-slate-900 tabular-nums">
+                            {donutTotalCents > 0 ? Math.round((entry.totalCents / donutTotalCents) * 100) : 0}%
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
             </LedgerCard>
           </section>
 

@@ -8,7 +8,7 @@ import {
 } from 'react';
 import api from './api';
 
-interface AuthUser {
+export interface AuthUser {
   id: string;
   fullName: string;
   email: string;
@@ -29,14 +29,27 @@ interface AuthContextValue {
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 const TOKEN_KEY = 'auth_token';
+const USER_KEY = 'auth_user';
 
 function getStoredToken(): string | null {
   return localStorage.getItem(TOKEN_KEY);
 }
 
+function getStoredUser(): AuthUser | null {
+  try {
+    const raw = localStorage.getItem(USER_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+}
+
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [user, setUser] = useState<AuthUser | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [user, setUser] = useState<AuthUser | null>(() => getStoredUser());
+  const [loading, setLoading] = useState<boolean>(() => {
+    // If we have both token and cached user, we can start non-blocking
+    return !!getStoredToken();
+  });
 
   useEffect(() => {
     const token = getStoredToken();
@@ -48,11 +61,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     api
       .get('/auth/me')
       .then((response) => {
-        setUser(response.data.data.user);
+        const authUser = response.data?.data?.user;
+        if (authUser) {
+          setUser(authUser);
+          localStorage.setItem(USER_KEY, JSON.stringify(authUser));
+        }
       })
-      .catch(() => {
-        localStorage.removeItem(TOKEN_KEY);
-        setUser(null);
+      .catch((err) => {
+        // Only clear credentials if backend explicitly rejects the token as unauthorized (401)
+        if (err.response?.status === 401) {
+          localStorage.removeItem(TOKEN_KEY);
+          localStorage.removeItem(USER_KEY);
+          setUser(null);
+        }
       })
       .finally(() => {
         setLoading(false);
@@ -65,6 +86,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const response = await api.post('/auth/login', { email, password });
         const { user: authUser, token } = response.data.data;
         localStorage.setItem(TOKEN_KEY, token);
+        localStorage.setItem(USER_KEY, JSON.stringify(authUser));
         setUser(authUser);
         return { error: null };
       } catch (error: unknown) {
@@ -92,6 +114,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         });
         const { user: authUser, token } = response.data.data;
         localStorage.setItem(TOKEN_KEY, token);
+        localStorage.setItem(USER_KEY, JSON.stringify(authUser));
         setUser(authUser);
         return { error: null };
       } catch (error: unknown) {
@@ -107,6 +130,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = useCallback(async () => {
     localStorage.removeItem(TOKEN_KEY);
+    localStorage.removeItem(USER_KEY);
     setUser(null);
   }, []);
 
@@ -114,15 +138,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   return (
     <AuthContext.Provider
-      value={{ user, loading, signIn, signUp, signOut, getToken }}
+      value={{
+        user,
+        loading,
+        signIn,
+        signUp,
+        signOut,
+        getToken,
+      }}
     >
       {children}
     </AuthContext.Provider>
   );
 }
 
-export function useAuth(): AuthContextValue {
-  const ctx = useContext(AuthContext);
-  if (!ctx) throw new Error('useAuth must be used inside <AuthProvider>');
-  return ctx;
+export function useAuth() {
+  const context = useContext(AuthContext);
+  if (context === undefined) {
+    throw new Error('useAuth must be used within an AuthProvider');
+  }
+  return context;
 }

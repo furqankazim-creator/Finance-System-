@@ -1,8 +1,6 @@
 import type { CSSProperties, InputHTMLAttributes, MouseEvent, ReactNode, SelectHTMLAttributes, TextareaHTMLAttributes } from 'react';
 import { cn } from '@/lib/utils';
 
-const serifStyle = { fontFamily: "Georgia, 'Times New Roman', serif" };
-
 export function LedgerPage({
   children,
   className,
@@ -10,7 +8,7 @@ export function LedgerPage({
   children: ReactNode;
   className?: string;
 }) {
-  return <div className={cn('mx-auto max-w-[980px] space-y-5', className)}>{children}</div>;
+  return <div className={cn('mx-auto max-w-[1180px] space-y-6', className)}>{children}</div>;
 }
 
 export function LedgerHeader({
@@ -27,15 +25,18 @@ export function LedgerHeader({
   return (
     <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
       <div>
-        <p className="text-[10px] font-medium uppercase tracking-[0.22em] text-[#7f8279]">
-          {eyebrow}
-        </p>
-        <h1 className="mt-1 text-[28px] leading-none text-[#1f352c]" style={serifStyle}>
+        <div className="flex items-center gap-2">
+          <span className="inline-block h-1.5 w-1.5 rounded-full bg-emerald-500" />
+          <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-emerald-700">
+            {eyebrow}
+          </p>
+        </div>
+        <h1 className="mt-1.5 text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">
           {title}
         </h1>
-        <p className="mt-2 text-[13px] text-[#6c726c]">{description}</p>
+        <p className="mt-1 text-sm text-slate-500">{description}</p>
       </div>
-      {action}
+      {action && <div className="flex shrink-0 items-center gap-2.5">{action}</div>}
     </div>
   );
 }
@@ -56,9 +57,12 @@ export function LedgerButton({
   variant?: 'primary' | 'secondary' | 'danger';
 }) {
   const variantClass = {
-    primary: 'bg-[#0d6847] text-[#f3efe4] hover:bg-[#0b5b3d]',
-    secondary: 'border border-[#d7d1c6] bg-[#fbfaf6] text-[#31443c] hover:bg-[#f1ece2]',
-    danger: 'bg-[#c2555f] text-[#fbfaf6] hover:bg-[#ab4750]',
+    primary:
+      'bg-emerald-600 text-white shadow-sm shadow-emerald-600/25 hover:bg-emerald-700 active:scale-[0.99] focus:ring-2 focus:ring-emerald-500/30',
+    secondary:
+      'border border-slate-200 bg-white text-slate-700 shadow-sm hover:bg-slate-50 hover:text-slate-900 active:scale-[0.99] focus:ring-2 focus:ring-slate-200',
+    danger:
+      'bg-rose-600 text-white shadow-sm shadow-rose-600/25 hover:bg-rose-700 active:scale-[0.99] focus:ring-2 focus:ring-rose-500/30',
   }[variant];
 
   return (
@@ -67,7 +71,7 @@ export function LedgerButton({
       onClick={onClick}
       disabled={disabled}
       className={cn(
-        'inline-flex items-center justify-center rounded-[8px] px-4 py-2 text-[12px] font-medium transition disabled:cursor-not-allowed disabled:opacity-60',
+        'inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-xs font-semibold tracking-wide transition-all duration-150 disabled:cursor-not-allowed disabled:opacity-50',
         variantClass,
         className
       )}
@@ -91,8 +95,10 @@ export function LedgerRowAction({
       type="button"
       onClick={onClick}
       className={cn(
-        'text-[11px] font-medium underline-offset-2 hover:underline',
-        tone === 'danger' ? 'text-[#b25d67]' : 'text-[#0d6847]'
+        'inline-flex items-center rounded-lg px-2.5 py-1 text-xs font-medium transition-colors',
+        tone === 'danger'
+          ? 'text-rose-600 hover:bg-rose-50 hover:text-rose-700'
+          : 'text-emerald-700 hover:bg-emerald-50 hover:text-emerald-800'
       )}
     >
       {children}
@@ -116,7 +122,7 @@ export function LedgerCard({
       style={style}
       onClick={onClick}
       className={cn(
-        'rounded-[10px] border border-[#d8d2c7] bg-[#fbfaf6] shadow-[0_1px_0_rgba(80,85,71,0.04)]',
+        'rounded-2xl border border-slate-200/90 bg-white p-5 shadow-sm shadow-slate-100 transition-all duration-200 hover:border-slate-300',
         className
       )}
     >
@@ -138,7 +144,12 @@ export function LedgerSelect({
 }) {
   if (!options) {
     return (
-      <div className={cn('min-w-[126px] rounded-[7px] border border-[#ddd7cc] bg-[#fbfaf6] px-3 py-2 text-[12px] text-[#49544d]', className)}>
+      <div
+        className={cn(
+          'min-w-[130px] rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-medium text-slate-700 shadow-sm',
+          className
+        )}
+      >
         {value}
       </div>
     );
@@ -149,7 +160,7 @@ export function LedgerSelect({
       value={value}
       onChange={(e) => onChange?.(e.target.value)}
       className={cn(
-        'min-w-[126px] rounded-[7px] border border-[#ddd7cc] bg-[#fbfaf6] px-3 py-2 text-[12px] text-[#49544d] outline-none focus:border-[#0d6847]',
+        'min-w-[130px] cursor-pointer rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-medium text-slate-700 shadow-sm outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20',
         className
       )}
     >
@@ -173,27 +184,40 @@ export function LedgerStatCard({
   note: string;
   noteTone?: 'positive' | 'negative' | 'muted';
 }) {
-  const noteClass =
+  const noteBadgeClass =
     noteTone === 'positive'
-      ? 'text-[#2c9a74]'
+      ? 'bg-emerald-50 text-emerald-700 border-emerald-200/60'
       : noteTone === 'negative'
-        ? 'text-[#d27777]'
-        : 'text-[#7b8078]';
+        ? 'bg-rose-50 text-rose-700 border-rose-200/60'
+        : 'bg-slate-50 text-slate-600 border-slate-200/60';
 
   return (
-    <LedgerCard className="p-4">
-      <p className="text-[9px] font-semibold uppercase tracking-[0.14em] text-[#909388]">{label}</p>
-      <p className="mt-2 text-[27px] leading-none text-[#293d34]" style={serifStyle}>
-        {value}
-      </p>
-      <p className={cn('mt-2 text-[11px]', noteClass)}>{note}</p>
+    <LedgerCard className="relative flex flex-col justify-between overflow-hidden p-5">
+      <div>
+        <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500">{label}</p>
+        <p className="mt-2 text-2xl font-bold tracking-tight text-slate-900 tabular-nums lg:text-[28px]">
+          {value}
+        </p>
+      </div>
+      <div className="mt-3 flex items-center">
+        <span
+          className={cn(
+            'inline-flex items-center rounded-lg border px-2 py-0.5 text-[11px] font-semibold',
+            noteBadgeClass
+          )}
+        >
+          {note}
+        </span>
+      </div>
     </LedgerCard>
   );
 }
 
 export function LedgerSectionTitle({ children }: { children: ReactNode }) {
   return (
-    <p className="border-b border-[#ded8cd] px-4 py-3 text-[11px] text-[#7a7f77]">{children}</p>
+    <div className="border-b border-slate-100 px-5 py-3.5 text-xs font-semibold tracking-wide text-slate-500 uppercase">
+      {children}
+    </div>
   );
 }
 
@@ -207,17 +231,17 @@ export function LedgerTable({
   compact?: boolean;
 }) {
   return (
-    <LedgerCard className="overflow-hidden">
+    <div className="overflow-hidden rounded-2xl border border-slate-200/90 bg-white shadow-sm shadow-slate-100">
       <div className="overflow-x-auto">
         <table className="min-w-full border-collapse">
           <thead>
-            <tr className="border-b border-[#ded8cd] bg-[#f9f7f1]">
+            <tr className="border-b border-slate-200/80 bg-slate-50/70">
               {headers.map((header) => (
                 <th
                   key={header}
                   className={cn(
-                    'px-4 text-left text-[10px] font-semibold uppercase tracking-[0.12em] text-[#7e837b]',
-                    compact ? 'py-2.5' : 'py-3'
+                    'px-5 text-left text-[11px] font-bold uppercase tracking-wider text-slate-500',
+                    compact ? 'py-3' : 'py-3.5'
                   )}
                 >
                   {header}
@@ -225,10 +249,10 @@ export function LedgerTable({
               ))}
             </tr>
           </thead>
-          <tbody>{children}</tbody>
+          <tbody className="divide-y divide-slate-100">{children}</tbody>
         </table>
       </div>
-    </LedgerCard>
+    </div>
   );
 }
 
@@ -239,7 +263,11 @@ export function LedgerRow({
   children: ReactNode;
   className?: string;
 }) {
-  return <tr className={cn('border-b border-[#ebe5da] last:border-b-0', className)}>{children}</tr>;
+  return (
+    <tr className={cn('transition-colors hover:bg-slate-50/60', className)}>
+      {children}
+    </tr>
+  );
 }
 
 export function LedgerCell({
@@ -259,8 +287,8 @@ export function LedgerCell({
     <td
       style={style}
       className={cn(
-        'px-4 py-3 text-[12px]',
-        strong ? 'font-semibold text-[#344840]' : muted ? 'text-[#6d746d]' : 'text-[#425048]',
+        'px-5 py-3.5 text-xs',
+        strong ? 'font-semibold text-slate-900' : muted ? 'text-slate-500' : 'text-slate-700',
         className
       )}
     >
@@ -277,14 +305,19 @@ export function LedgerBadge({
   tone?: 'green' | 'yellow' | 'red' | 'neutral';
 }) {
   const toneClass = {
-    green: 'bg-[#d7efdf] text-[#418562]',
-    yellow: 'bg-[#f4e9c9] text-[#8f7a2f]',
-    red: 'bg-[#f3dbdd] text-[#ba676f]',
-    neutral: 'bg-[#ece8de] text-[#776f5f]',
+    green: 'bg-emerald-50 text-emerald-700 border-emerald-200/70',
+    yellow: 'bg-amber-50 text-amber-700 border-amber-200/70',
+    red: 'bg-rose-50 text-rose-700 border-rose-200/70',
+    neutral: 'bg-slate-100 text-slate-700 border-slate-200',
   }[tone];
 
   return (
-    <span className={cn('inline-flex rounded-full px-2 py-0.5 text-[10px] font-medium capitalize', toneClass)}>
+    <span
+      className={cn(
+        'inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-semibold capitalize tracking-wide',
+        toneClass
+      )}
+    >
       {children}
     </span>
   );
@@ -292,8 +325,11 @@ export function LedgerBadge({
 
 export function LedgerProgress({ value }: { value: number }) {
   return (
-    <div className="h-[4px] rounded-full bg-[#e7e1d6]">
-      <div className="h-[4px] rounded-full bg-[#0d6847]" style={{ width: `${value}%` }} />
+    <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+      <div
+        className="h-full rounded-full bg-emerald-600 transition-all duration-300"
+        style={{ width: `${Math.min(100, Math.max(0, value))}%` }}
+      />
     </div>
   );
 }
@@ -314,22 +350,22 @@ export function LedgerModal({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-[#1c2620]/40 px-4 py-10">
+    <div className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-slate-900/40 p-4 pt-12 backdrop-blur-sm sm:p-6">
       <div
-        className="w-full max-w-lg rounded-[12px] border border-[#d8d2c7] bg-[#fbfaf6] p-6 shadow-[0_10px_30px_rgba(30,40,34,0.18)]"
+        className="w-full max-w-lg rounded-2xl border border-slate-200 bg-white p-6 shadow-2xl shadow-slate-900/15 animate-in fade-in zoom-in-95 duration-150"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="mb-5 flex items-start justify-between gap-4">
           <div>
-            <h2 className="text-[18px] leading-none text-[#1f352c]" style={serifStyle}>
+            <h2 className="text-lg font-bold tracking-tight text-slate-900">
               {title}
             </h2>
-            {description && <p className="mt-1.5 text-[12px] text-[#6c726c]">{description}</p>}
+            {description && <p className="mt-1 text-xs text-slate-500">{description}</p>}
           </div>
           <button
             type="button"
             onClick={onClose}
-            className="text-[13px] text-[#8b8f85] hover:text-[#31443c]"
+            className="flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition"
             aria-label="Close"
           >
             ✕
@@ -352,14 +388,14 @@ export function LedgerField({
 }) {
   return (
     <label className={cn('block space-y-1.5', className)}>
-      <span className="block text-[11px] font-medium text-[#4b544c]">{label}</span>
+      <span className="block text-xs font-semibold text-slate-700">{label}</span>
       {children}
     </label>
   );
 }
 
 const fieldClass =
-  'w-full rounded-[7px] border border-[#d9d3c8] bg-white px-3 py-2 text-[12px] text-[#31443c] outline-none placeholder:text-[#9aa097] focus:border-[#0d6847]';
+  'w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20';
 
 export function LedgerInput(props: InputHTMLAttributes<HTMLInputElement>) {
   const { className, ...rest } = props;
@@ -368,7 +404,7 @@ export function LedgerInput(props: InputHTMLAttributes<HTMLInputElement>) {
 
 export function LedgerTextarea(props: TextareaHTMLAttributes<HTMLTextAreaElement>) {
   const { className, ...rest } = props;
-  return <textarea {...rest} className={cn(fieldClass, 'min-h-[72px] resize-y', className)} />;
+  return <textarea {...rest} className={cn(fieldClass, 'min-h-[80px] resize-y', className)} />;
 }
 
 export function LedgerFormSelect(
@@ -376,7 +412,7 @@ export function LedgerFormSelect(
 ) {
   const { className, options, ...rest } = props;
   return (
-    <select {...rest} className={cn(fieldClass, className)}>
+    <select {...rest} className={cn(fieldClass, 'cursor-pointer', className)}>
       {options.map((option) => (
         <option key={option.value} value={option.value}>
           {option.label}
@@ -396,12 +432,12 @@ export function LedgerCheckboxField({
   onChange: (checked: boolean) => void;
 }) {
   return (
-    <label className="flex items-center gap-2 text-[12px] text-[#4b544c]">
+    <label className="flex cursor-pointer items-center gap-2.5 text-xs font-medium text-slate-700">
       <input
         type="checkbox"
         checked={checked}
         onChange={(e) => onChange(e.target.checked)}
-        className="h-3.5 w-3.5 rounded border-[#d9d3c8] text-[#0d6847] focus:ring-0"
+        className="h-4 w-4 rounded border-slate-300 text-emerald-600 focus:ring-emerald-500"
       />
       {label}
     </label>
@@ -409,12 +445,12 @@ export function LedgerCheckboxField({
 }
 
 export function LedgerFormActions({ children }: { children: ReactNode }) {
-  return <div className="mt-6 flex justify-end gap-2">{children}</div>;
+  return <div className="mt-6 flex justify-end gap-2.5">{children}</div>;
 }
 
 export function LedgerFormError({ children }: { children: ReactNode }) {
   return (
-    <div className="rounded-[7px] border border-[#efc9cc] bg-[#faecee] px-3 py-2 text-[12px] text-[#b25d67]">
+    <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-xs font-medium text-rose-700">
       {children}
     </div>
   );
@@ -423,7 +459,7 @@ export function LedgerFormError({ children }: { children: ReactNode }) {
 export function LedgerEmptyRow({ colSpan, children }: { colSpan: number; children: ReactNode }) {
   return (
     <tr>
-      <td colSpan={colSpan} className="px-4 py-8 text-center text-[12px] text-[#8b8f85]">
+      <td colSpan={colSpan} className="px-4 py-10 text-center text-xs text-slate-400">
         {children}
       </td>
     </tr>

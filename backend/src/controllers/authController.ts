@@ -208,6 +208,7 @@ export const getMe = async (
       throw new AppError("User not found", 404);
     }
 
+    res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, private");
     res.status(200).json({
       success: true,
       data: {
@@ -217,6 +218,45 @@ export const getMe = async (
           email: user.email,
         },
       },
+    });
+  } catch (err) {
+    next(err);
+  }
+};
+
+export const changePassword = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
+  try {
+    const userId = req.user?.id;
+    const { currentPassword, newPassword } = req.body;
+
+    if (!currentPassword || !newPassword) {
+      throw new AppError("Current password and new password are required", 400);
+    }
+    if (typeof newPassword !== "string" || newPassword.length < 8) {
+      throw new AppError("New password must be at least 8 characters", 400);
+    }
+
+    const user = await User.findById(userId);
+    if (!user) {
+      throw new AppError("User not found", 404);
+    }
+
+    const matches = await comparePassword(currentPassword, user.password);
+    if (!matches) {
+      throw new AppError("Current password is incorrect", 400);
+    }
+
+    user.password = await hashPassword(newPassword);
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Password updated successfully",
+      data: null,
     });
   } catch (err) {
     next(err);

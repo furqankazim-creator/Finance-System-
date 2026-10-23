@@ -4,7 +4,19 @@ export interface IOrganization extends Document {
   name: string;
   currency: string;
   fiscalYearStart: number; // month 1-12
-  userId: string; // Supabase user ID who owns this org
+  userId: string; // user ID who owns this org
+  taxId?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+  city?: string;
+  country?: string;
+  invoicePrefix?: string;
+  paymentTermsDays?: number;
+  partnerEmails?: string[];
+  weeklyDigestEnabled?: boolean;
+  monthlyDigestEnabled?: boolean;
+  notes?: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -36,6 +48,62 @@ const OrganizationSchema = new Schema<IOrganization>(
       type: String,
       required: [true, "User ID is required"],
       index: true,
+    },
+    taxId: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    email: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    phone: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    address: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    city: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+    country: {
+      type: String,
+      trim: true,
+      default: "Pakistan",
+    },
+    invoicePrefix: {
+      type: String,
+      trim: true,
+      default: "INV-",
+    },
+    paymentTermsDays: {
+      type: Number,
+      default: 30,
+    },
+    partnerEmails: {
+      type: [String],
+      default: [],
+    },
+    weeklyDigestEnabled: {
+      type: Boolean,
+      default: true,
+    },
+    monthlyDigestEnabled: {
+      type: Boolean,
+      default: true,
+    },
+    notes: {
+      type: String,
+      trim: true,
+      default: "",
     },
   },
   {
