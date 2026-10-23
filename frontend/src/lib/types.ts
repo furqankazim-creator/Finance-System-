@@ -302,3 +302,44 @@ export interface StatementFile {
   notes?: string;
   createdAt: string;
 }
+
+export interface ExecutiveReportData {
+  orgName: string;
+  currency: string;
+  periodType: 'weekly' | 'monthly' | 'custom';
+  periodLabel: string;
+  from: string;
+  to: string;
+  prevFrom: string;
+  prevTo: string;
+  revenueCents: number;
+  expensesCents: number;
+  netProfitCents: number;
+  netMarginPct: number;
+  prevRevenueCents: number;
+  prevExpensesCents: number;
+  prevNetProfitCents: number;
+  revenueChangePct: number | null;
+  expensesChangePct: number | null;
+  netProfitChangePct: number | null;
+  cashInBankCents: number;
+  receivables: {
+    totalCents: number;
+    openCount: number;
+    overdueCount: number;
+    overdueCents: number;
+  };
+  payables: {
+    totalCents: number;
+    pendingPayrollCents: number;
+    openLoansCents: number;
+  };
+  invoicesBilledCount: number;
+  invoicesBilledTotalCents: number;
+  topExpenses: {
+    categoryName: string;
+    totalCents: number;
+    percentage: number;
+  }[];
+}
+

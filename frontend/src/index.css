@@ -60,3 +60,15 @@
     text-rendering: optimizeLegibility;
   }
 }
+
+@media print {
+  aside, header, nav, .no-print {
+    display: none !important;
+  }
+  body, main {
+    background: #ffffff !important;
+    color: #111827 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+}
