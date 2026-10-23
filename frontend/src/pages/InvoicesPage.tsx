@@ -162,6 +162,20 @@ export default function InvoicesPage() {
     }
   };
 
+  const downloadPdf = async (invoice: Invoice) => {
+    try {
+      const res = await api.get(`/invoices/${invoice._id}/pdf`, { responseType: 'blob' });
+      const url = URL.createObjectURL(res.data);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `invoice-${invoice.invoiceNumber || invoice._id.slice(-6)}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to download official invoice PDF');
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSaving(true);
@@ -254,7 +268,8 @@ export default function InvoicesPage() {
               </LedgerCell>
               <LedgerCell className="font-semibold text-[#405048]">{formatCents(invoice.amountCents)}</LedgerCell>
               <LedgerCell className="text-right">
-                <div className="flex justify-end gap-3">
+                <div className="flex justify-end gap-2.5">
+                  <LedgerRowAction onClick={() => downloadPdf(invoice)}>PDF</LedgerRowAction>
                   {invoice.status !== 'paid' && invoice.status !== 'cancelled' && (
                     <LedgerRowAction onClick={() => openPayment(invoice)}>Record payment</LedgerRowAction>
                   )}

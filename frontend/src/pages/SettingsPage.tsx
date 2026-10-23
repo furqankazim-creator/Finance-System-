@@ -12,6 +12,12 @@ import {
   LedgerTextarea,
   LedgerFormSelect,
   LedgerFormError,
+  LedgerTable,
+  LedgerRow,
+  LedgerCell,
+  LedgerBadge,
+  LedgerModal,
+  LedgerRowAction,
 } from '@/components/app/ledger-ui';
 
 interface OrgSettings {
@@ -33,7 +39,15 @@ interface OrgSettings {
   notes?: string;
 }
 
-type SettingsTab = 'organization' | 'reports' | 'invoicing' | 'security' | 'system';
+interface TeamMember {
+  _id: string;
+  fullName: string;
+  email: string;
+  role: 'admin' | 'accountant' | 'auditor' | 'viewer';
+  createdAt?: string;
+}
+
+type SettingsTab = 'organization' | 'reports' | 'invoicing' | 'team' | 'security' | 'system';
 
 export default function SettingsPage() {
   const { user } = useAuth();
@@ -83,6 +97,22 @@ export default function SettingsPage() {
     accountsCount?: number;
   }>({});
 
+  // Team & RBAC state
+  const [teamMembers, setTeamMembers] = useState<TeamMember[]>([]);
+  const [inviteModalOpen, setInviteModalOpen] = useState(false);
+  const [inviteLoading, setInviteLoading] = useState(false);
+  const [inviteForm, setInviteForm] = useState({
+    fullName: '',
+    email: '',
+    password: '',
+    role: 'accountant' as 'admin' | 'accountant' | 'auditor' | 'viewer',
+  });
+  const [inviteError, setInviteError] = useState('');
+  const [inviteSuccess, setInviteSuccess] = useState('');
+  const [roleUpdatingId, setRoleUpdatingId] = useState<string | null>(null);
+  const [cronDispatching, setCronDispatching] = useState(false);
+  const [cronStatusMsg, setCronStatusMsg] = useState('');
+
   useEffect(() => {
     loadSettings();
   }, []);
@@ -91,12 +121,13 @@ export default function SettingsPage() {
     setLoading(true);
     setError('');
     try {
-      const [orgRes, invoicesRes, expensesRes, clientsRes, accountsRes] = await Promise.allSettled([
+      const [orgRes, invoicesRes, expensesRes, clientsRes, accountsRes, teamRes] = await Promise.allSettled([
         api.get('/organizations/me'),
         api.get('/invoices?limit=1'),
         api.get('/expenses?limit=1'),
         api.get('/clients?limit=1'),
         api.get('/accounts'),
+        api.get('/organizations/team'),
       ]);
 
       if (orgRes.status === 'fulfilled' && orgRes.value.data.data) {
@@ -121,6 +152,10 @@ export default function SettingsPage() {
         setPartnerEmailsInput((org.partnerEmails || []).join(', '));
       }
 
+      if (teamRes.status === 'fulfilled' && Array.isArray(teamRes.value.data?.data)) {
+        setTeamMembers(teamRes.value.data.data);
+      }
+
       setSystemStats({
         invoicesCount: invoicesRes.status === 'fulfilled' ? invoicesRes.value.data?.pagination?.total || 0 : 0,
         expensesCount: expensesRes.status === 'fulfilled' ? expensesRes.value.data?.pagination?.total || 0 : 0,
@@ -131,6 +166,94 @@ export default function SettingsPage() {
       setError(err instanceof Error ? err.message : 'Failed to load organization settings');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleInviteMember = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setInviteLoading(true);
+    setInviteError('');
+    setInviteSuccess('');
+
+    if (!inviteForm.fullName.trim() || !inviteForm.email.trim() || !inviteForm.password) {
+      setInviteError('Please fill in all required fields.');
+      setInviteLoading(false);
+      return;
+    }
+
+    if (inviteForm.password.length < 8) {
+      setInviteError('Password must be at least 8 characters.');
+      setInviteLoading(false);
+      return;
+    }
+
+    try {
+      const res = await api.post('/organizations/team/invite', inviteForm);
+      setInviteSuccess(`Team member ${inviteForm.fullName} invited successfully!`);
+      if (res.data?.data) {
+        setTeamMembers((prev) => [...prev, res.data.data]);
+      }
+      setInviteForm({
+        fullName: '',
+        email: '',
+        password: '',
+        role: 'accountant',
+      });
+      setTimeout(() => {
+        setInviteModalOpen(false);
+        setInviteSuccess('');
+      }, 1500);
+    } catch (err: any) {
+      setInviteError(err.response?.data?.message || err.message || 'Failed to invite team member');
+    } finally {
+      setInviteLoading(false);
+    }
+  };
+
+  const handleUpdateRole = async (userId: string, newRole: 'admin' | 'accountant' | 'auditor' | 'viewer') => {
+    setRoleUpdatingId(userId);
+    setError('');
+    try {
+      const res = await api.patch(`/organizations/team/${userId}/role`, { role: newRole });
+      if (res.data?.data) {
+        setTeamMembers((prev) =>
+          prev.map((m) => (m._id === userId ? { ...m, role: res.data.data.role } : m))
+        );
+      }
+      setSuccessMsg('Member role updated successfully');
+      setTimeout(() => setSuccessMsg(''), 3000);
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to update member role');
+    } finally {
+      setRoleUpdatingId(null);
+    }
+  };
+
+  const handleRemoveMember = async (userId: string, name: string) => {
+    if (!window.confirm(`Are you sure you want to remove ${name} from this organization?`)) {
+      return;
+    }
+    try {
+      await api.delete(`/organizations/team/${userId}`);
+      setTeamMembers((prev) => prev.filter((m) => m._id !== userId));
+      setSuccessMsg(`${name} has been removed from the team`);
+      setTimeout(() => setSuccessMsg(''), 3000);
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to remove team member');
+    }
+  };
+
+  const handleTriggerCronDigest = async (type: 'weekly' | 'monthly') => {
+    setCronDispatching(true);
+    setCronStatusMsg('');
+    try {
+      const res = await api.post('/reports/dispatch-scheduled', { type });
+      setCronStatusMsg(res.data?.message || `Scheduled ${type} digest dispatched successfully!`);
+      setTimeout(() => setCronStatusMsg(''), 5000);
+    } catch (err: any) {
+      setCronStatusMsg(err.response?.data?.message || 'Failed to dispatch scheduled report');
+    } finally {
+      setCronDispatching(false);
     }
   };
 
@@ -225,6 +348,7 @@ export default function SettingsPage() {
     { id: 'organization', label: 'Organization & Profile', icon: '🏢' },
     { id: 'reports', label: 'Partner & Digest Reports', icon: '📊' },
     { id: 'invoicing', label: 'Invoicing & Defaults', icon: '🧾' },
+    { id: 'team', label: 'Team & Roles (RBAC)', icon: '👥' },
     { id: 'security', label: 'Security & Access', icon: '🔒' },
     { id: 'system', label: 'System & Data', icon: '⚙️' },
   ];
@@ -555,6 +679,249 @@ export default function SettingsPage() {
             </div>
           )}
 
+          {/* TAB: TEAM & ROLES (RBAC) */}
+          {activeTab === 'team' && (
+            <div className="space-y-6">
+              <LedgerCard className="p-6">
+                <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between border-b border-slate-100 pb-4 dark:border-slate-800">
+                  <div>
+                    <h2 className="text-base font-semibold text-slate-800 dark:text-white">
+                      Team Members & Access Control (RBAC)
+                    </h2>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                      Invite finance team members and assign role-based permissions (Admin, Accountant, Auditor, Viewer).
+                    </p>
+                  </div>
+                  <LedgerButton
+                    type="button"
+                    onClick={() => {
+                      setInviteError('');
+                      setInviteSuccess('');
+                      setInviteModalOpen(true);
+                    }}
+                  >
+                    ➕ Invite Team Member
+                  </LedgerButton>
+                </div>
+
+                {teamMembers.length === 0 ? (
+                  <div className="py-10 text-center">
+                    <p className="text-sm font-medium text-slate-600 dark:text-slate-300">No additional team members found.</p>
+                    <p className="mt-1 text-xs text-slate-400">
+                      Invite your accountants or auditors to collaborate on this organization.
+                    </p>
+                  </div>
+                ) : (
+                  <LedgerTable headers={['Member / Email', 'Current Role', 'Change Role', 'Joined Date', 'Actions']}>
+                    {teamMembers.map((member) => {
+                      const isSelf = member._id === user?.id;
+                      const roleTone =
+                        member.role === 'admin'
+                          ? 'green'
+                          : member.role === 'accountant'
+                          ? 'yellow'
+                          : 'neutral';
+
+                      return (
+                        <LedgerRow key={member._id}>
+                          <LedgerCell strong>
+                            <div className="flex items-center gap-3">
+                              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-emerald-600 to-teal-700 text-xs font-bold text-white shadow-sm">
+                                {member.fullName.slice(0, 2).toUpperCase()}
+                              </div>
+                              <div>
+                                <div className="flex items-center gap-1.5">
+                                  <span className="font-semibold text-slate-900 dark:text-white">
+                                    {member.fullName}
+                                  </span>
+                                  {isSelf && (
+                                    <span className="rounded-md bg-emerald-100 px-1.5 py-0.5 text-[10px] font-bold text-emerald-800 dark:bg-emerald-950 dark:text-emerald-400">
+                                      You
+                                    </span>
+                                  )}
+                                </div>
+                                <span className="text-xs text-slate-400 dark:text-slate-500 font-normal">
+                                  {member.email}
+                                </span>
+                              </div>
+                            </div>
+                          </LedgerCell>
+
+                          <LedgerCell>
+                            <LedgerBadge tone={roleTone}>
+                              {member.role === 'admin'
+                                ? 'Admin (Full)'
+                                : member.role === 'accountant'
+                                ? 'Accountant'
+                                : member.role === 'auditor'
+                                ? 'Auditor'
+                                : 'Viewer'}
+                            </LedgerBadge>
+                          </LedgerCell>
+
+                          <LedgerCell>
+                            <select
+                              value={member.role}
+                              disabled={isSelf || roleUpdatingId === member._id}
+                              onChange={(e) =>
+                                handleUpdateRole(
+                                  member._id,
+                                  e.target.value as 'admin' | 'accountant' | 'auditor' | 'viewer'
+                                )
+                              }
+                              className="cursor-pointer rounded-lg border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-700 shadow-sm outline-none transition hover:border-slate-300 focus:border-emerald-500 disabled:cursor-not-allowed disabled:opacity-50 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200"
+                            >
+                              <option value="admin">Admin</option>
+                              <option value="accountant">Accountant</option>
+                              <option value="auditor">Auditor</option>
+                              <option value="viewer">Viewer</option>
+                            </select>
+                          </LedgerCell>
+
+                          <LedgerCell muted>
+                            {member.createdAt
+                              ? new Date(member.createdAt).toLocaleDateString(undefined, {
+                                  year: 'numeric',
+                                  month: 'short',
+                                  day: 'numeric',
+                                })
+                              : 'Active'}
+                          </LedgerCell>
+
+                          <LedgerCell>
+                            {isSelf ? (
+                              <span className="text-[11px] text-slate-400">Current Session</span>
+                            ) : (
+                              <LedgerRowAction
+                                tone="danger"
+                                onClick={() => handleRemoveMember(member._id, member.fullName)}
+                              >
+                                Remove
+                              </LedgerRowAction>
+                            )}
+                          </LedgerCell>
+                        </LedgerRow>
+                      );
+                    })}
+                  </LedgerTable>
+                )}
+              </LedgerCard>
+
+              {/* RBAC PERMISSION MATRIX EXPLANATION */}
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+                <LedgerCard className="p-4">
+                  <div className="flex items-center gap-2">
+                    <span className="inline-block h-2 w-2 rounded-full bg-emerald-500" />
+                    <p className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-100">
+                      Admin
+                    </p>
+                  </div>
+                  <p className="mt-2 text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                    Full organizational control, team member invites, role promotion, system preferences, and cron scheduler dispatches.
+                  </p>
+                </LedgerCard>
+
+                <LedgerCard className="p-4">
+                  <div className="flex items-center gap-2">
+                    <span className="inline-block h-2 w-2 rounded-full bg-amber-500" />
+                    <p className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-100">
+                      Accountant
+                    </p>
+                  </div>
+                  <p className="mt-2 text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                    Create and issue invoices, record business expenses, register bank accounts, and generate official client PDFs.
+                  </p>
+                </LedgerCard>
+
+                <LedgerCard className="p-4">
+                  <div className="flex items-center gap-2">
+                    <span className="inline-block h-2 w-2 rounded-full bg-blue-500" />
+                    <p className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-100">
+                      Auditor
+                    </p>
+                  </div>
+                  <p className="mt-2 text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                    Read-only financial audit. Access to balance sheets, income statements, audit logs, and official A4 PDF downloads.
+                  </p>
+                </LedgerCard>
+
+                <LedgerCard className="p-4">
+                  <div className="flex items-center gap-2">
+                    <span className="inline-block h-2 w-2 rounded-full bg-slate-400" />
+                    <p className="text-xs font-bold uppercase tracking-wider text-slate-800 dark:text-slate-100">
+                      Viewer
+                    </p>
+                  </div>
+                  <p className="mt-2 text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
+                    Restricted executive review. High-level dashboard metrics and summaries without access to operational modification.
+                  </p>
+                </LedgerCard>
+              </div>
+
+              {/* AUTOMATED BACKGROUND CRON SCHEDULER STATUS */}
+              <LedgerCard className="p-6">
+                <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="inline-flex h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse" />
+                      <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
+                        Background Cron Engine & Digest Dispatcher
+                      </h3>
+                    </div>
+                    <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                      Automated digests are scheduled on the server for executive partners and leadership.
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap items-center gap-2">
+                    <LedgerButton
+                      type="button"
+                      variant="secondary"
+                      onClick={() => handleTriggerCronDigest('weekly')}
+                      disabled={cronDispatching}
+                    >
+                      {cronDispatching ? 'Dispatching...' : '⚡ Test Weekly Digest'}
+                    </LedgerButton>
+                    <LedgerButton
+                      type="button"
+                      variant="secondary"
+                      onClick={() => handleTriggerCronDigest('monthly')}
+                      disabled={cronDispatching}
+                    >
+                      {cronDispatching ? 'Dispatching...' : '⚡ Test Monthly Digest'}
+                    </LedgerButton>
+                  </div>
+                </div>
+
+                {cronStatusMsg && (
+                  <div className="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-xs font-medium text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300">
+                    ✓ {cronStatusMsg}
+                  </div>
+                )}
+
+                <div className="mt-4 grid gap-3 sm:grid-cols-2 text-xs text-slate-600 dark:text-slate-400 border-t border-slate-100 pt-3 dark:border-slate-800">
+                  <div className="flex items-start gap-2">
+                    <span className="text-base">📅</span>
+                    <div>
+                      <p className="font-semibold text-slate-800 dark:text-slate-200">Weekly Digest (Mondays 09:00 AM)</p>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                        Dispatches 7-day revenue, receivables due, and cash net change to registered partner emails.
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="text-base">📊</span>
+                    <div>
+                      <p className="font-semibold text-slate-800 dark:text-slate-200">Monthly Digest (1st of Month 09:00 AM)</p>
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400">
+                        Compiles complete calendar month P&L statement, profit margin percentage, and tax liabilities.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              </LedgerCard>
+            </div>
+          )}
+
           {/* TAB 4: SECURITY & ACCESS */}
           {activeTab === 'security' && (
             <div className="space-y-5">
@@ -666,7 +1033,7 @@ export default function SettingsPage() {
             </div>
           )}
 
-          {activeTab !== 'security' && (
+          {activeTab !== 'security' && activeTab !== 'team' && (
             <div className="flex justify-end gap-3 pt-3">
               <LedgerButton type="submit" disabled={saving}>
                 {saving ? 'Saving...' : 'Save All Changes'}
@@ -675,6 +1042,84 @@ export default function SettingsPage() {
           )}
         </form>
       )}
+
+      {/* INVITE TEAM MEMBER MODAL */}
+      <LedgerModal
+        open={inviteModalOpen}
+        onClose={() => setInviteModalOpen(false)}
+        title="Invite Team Member"
+        description="Add a colleague with dedicated role-based access to your organization's finance ledger."
+      >
+        <form onSubmit={handleInviteMember} className="space-y-4">
+          {inviteError && <LedgerFormError>{inviteError}</LedgerFormError>}
+          {inviteSuccess && (
+            <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-3 text-xs font-medium text-emerald-800 dark:border-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300">
+              ✓ {inviteSuccess}
+            </div>
+          )}
+
+          <LedgerField label="Full Name">
+            <LedgerInput
+              value={inviteForm.fullName}
+              onChange={(e) => setInviteForm({ ...inviteForm, fullName: e.target.value })}
+              placeholder="e.g. Tariq Mehmood"
+              required
+            />
+          </LedgerField>
+
+          <LedgerField label="Work Email Address">
+            <LedgerInput
+              type="email"
+              value={inviteForm.email}
+              onChange={(e) => setInviteForm({ ...inviteForm, email: e.target.value })}
+              placeholder="tariq@example.com"
+              required
+            />
+          </LedgerField>
+
+          <LedgerField label="Initial Password (min 8 characters)">
+            <LedgerInput
+              type="password"
+              value={inviteForm.password}
+              onChange={(e) => setInviteForm({ ...inviteForm, password: e.target.value })}
+              placeholder="••••••••"
+              required
+            />
+          </LedgerField>
+
+          <LedgerField label="Enterprise Role">
+            <LedgerFormSelect
+              value={inviteForm.role}
+              onChange={(e) =>
+                setInviteForm({
+                  ...inviteForm,
+                  role: e.target.value as 'admin' | 'accountant' | 'auditor' | 'viewer',
+                })
+              }
+              options={[
+                { value: 'accountant', label: 'Accountant (Invoices, Expenses & Books)' },
+                { value: 'auditor', label: 'Auditor (Read-Only Financial Records & PDF Exports)' },
+                { value: 'viewer', label: 'Viewer (Read-Only Dashboard)' },
+                { value: 'admin', label: 'Admin (Full Ledger & Team Management)' },
+              ]}
+            />
+          </LedgerField>
+
+          <div className="mt-5 flex items-center justify-end gap-2 border-t border-slate-100 pt-4 dark:border-slate-800">
+            <LedgerButton
+              type="button"
+              variant="secondary"
+              onClick={() => setInviteModalOpen(false)}
+              disabled={inviteLoading}
+            >
+              Cancel
+            </LedgerButton>
+            <LedgerButton type="submit" disabled={inviteLoading}>
+              {inviteLoading ? 'Creating Member...' : 'Create & Invite Member'}
+            </LedgerButton>
+          </div>
+        </form>
+      </LedgerModal>
     </LedgerPage>
   );
 }

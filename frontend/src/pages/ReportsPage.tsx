@@ -179,6 +179,40 @@ export default function ReportsPage() {
     }
   };
 
+  const [dispatchStatus, setDispatchStatus] = useState('');
+  const [dispatching, setDispatching] = useState(false);
+
+  const downloadExecutivePdf = async () => {
+    try {
+      const dateParam = periodType === 'weekly' ? selectedWeek : `${selectedMonth}-01`;
+      const res = await api.get(`/reports/executive/pdf?periodType=${periodType}&date=${dateParam}`, {
+        responseType: 'blob',
+      });
+      const url = URL.createObjectURL(res.data);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `executive-report-${periodType}-${dateParam}.pdf`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to download official executive PDF');
+    }
+  };
+
+  const handleTriggerAutomatedDigest = async () => {
+    setDispatching(true);
+    setDispatchStatus('');
+    try {
+      const res = await api.post('/reports/dispatch-scheduled', { periodType });
+      setDispatchStatus(`✓ ${res.data?.message || 'Automated digest triggered successfully'}`);
+      setTimeout(() => setDispatchStatus(''), 5000);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to dispatch scheduled report');
+    } finally {
+      setDispatching(false);
+    }
+  };
+
   const handlePrint = () => {
     window.print();
   };
@@ -207,22 +241,37 @@ export default function ReportsPage() {
           description="Weekly and monthly financial intelligence prepared for company leadership and business partners."
           action={
             <div className="flex flex-wrap items-center gap-2 sm:justify-end">
+              <LedgerButton variant="secondary" onClick={downloadExecutivePdf}>
+                📄 Official PDF
+              </LedgerButton>
+              <LedgerButton variant="secondary" onClick={handlePrint}>
+                🖨️ Print
+              </LedgerButton>
               <LedgerButton
                 variant="secondary"
+                onClick={handleTriggerAutomatedDigest}
+                disabled={dispatching}
+              >
+                {dispatching ? 'Dispatching...' : '⚡ Test Cron Dispatch'}
+              </LedgerButton>
+              <LedgerButton
                 onClick={() => {
                   setError('');
                   setEmailModalOpen(true);
                 }}
               >
-                ✉ Email Boss & Partners
-              </LedgerButton>
-              <LedgerButton variant="secondary" onClick={handlePrint}>
-                ⎙ Print / Save PDF
+                ✉ Email Partners
               </LedgerButton>
             </div>
           }
         />
       </div>
+
+      {dispatchStatus && (
+        <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-xs font-semibold text-emerald-800 shadow-sm dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-emerald-300">
+          {dispatchStatus}
+        </div>
+      )}
 
       {error && !emailModalOpen && <LedgerFormError>{error}</LedgerFormError>}
 

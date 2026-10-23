@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 import { AppError } from "./errorHandler";
+import { UserRole } from "../models/User";
 
 const JWT_SECRET = process.env.JWT_SECRET || "default_jwt_secret";
 
@@ -11,6 +12,8 @@ declare global {
       user?: {
         id: string;
         email: string;
+        role: UserRole;
+        organizationId?: string;
       };
     }
   }
@@ -34,11 +37,15 @@ export const authenticate = async (
       const decoded = jwt.verify(token, JWT_SECRET) as {
         id: string;
         email: string;
+        role?: UserRole;
+        organizationId?: string;
       };
 
       req.user = {
         id: decoded.id,
         email: decoded.email,
+        role: decoded.role || "admin",
+        organizationId: decoded.organizationId,
       };
     } catch (error) {
       throw new AppError("Invalid or expired authentication token", 401);
@@ -48,4 +55,23 @@ export const authenticate = async (
   } catch (err) {
     next(err);
   }
+};
+
+export const requireRoles = (...roles: UserRole[]) => {
+  return (req: Request, res: Response, next: NextFunction) => {
+    if (!req.user) {
+      return next(new AppError("User not authenticated", 401));
+    }
+    const currentRole = req.user.role || "admin";
+    // Admins always have full permissions
+    if (currentRole === "admin" || roles.includes(currentRole)) {
+      return next();
+    }
+    return next(
+      new AppError(
+        `Access forbidden: requires one of roles [${roles.join(", ")}]`,
+        403
+      )
+    );
+  };
 };

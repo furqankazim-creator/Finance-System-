@@ -12,6 +12,7 @@ export interface AuthUser {
   id: string;
   fullName: string;
   email: string;
+  role?: 'admin' | 'accountant' | 'auditor' | 'viewer';
 }
 
 interface AuthContextValue {

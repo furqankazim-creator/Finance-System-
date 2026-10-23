@@ -27,9 +27,11 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.1.1",
     "morgan": "^1.10.0",
+    "node-cron": "^4.6.0",
     "nodemailer": "^9.0.3",
     "papaparse": "^5.4.1",
     "pdf-parse": "^1.1.1",
+    "pdfkit": "^0.20.2",
     "xlsx": "^0.18.5"
   },
   "devDependencies": {
@@ -40,7 +42,9 @@
     "@types/jsonwebtoken": "^9.0.6",
     "@types/morgan": "^1.9.9",
     "@types/node": "^20.11.16",
+    "@types/node-cron": "^3.0.11",
     "@types/papaparse": "^5.3.14",
+    "@types/pdfkit": "^0.17.7",
     "nodemon": "^3.0.3",
     "ts-node": "^10.9.2",
     "typescript": "^5.3.3"

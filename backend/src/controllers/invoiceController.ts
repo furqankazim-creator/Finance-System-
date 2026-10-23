@@ -1,9 +1,10 @@
 import { Request, Response, NextFunction } from "express";
-import { Client, Invoice, InvoicePayment, Project } from "../models";
+import { Client, Invoice, InvoicePayment, Organization, Project } from "../models";
 import { sendSuccess, buildPagination } from "../utils/response";
 import { AppError } from "../middleware/errorHandler";
 import { toCents } from "../utils/money";
 import { assertBelongsToOrg, getOrgIdForUser } from "../utils/orgScope";
+import { generateInvoicePdf } from "../utils/pdfGenerator";
 
 // Auto-update overdue invoices
 const refreshOverdueStatus = async (orgId: unknown) => {
@@ -202,4 +203,23 @@ export const getPayments = async (req: Request, res: Response, next: NextFunctio
     const payments = await InvoicePayment.find({ invoiceId: invoice._id }).sort({ paidDate: -1 });
     sendSuccess(res, payments);
   } catch (err) { next(err); }
+};
+
+export const downloadInvoicePdf = async (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const orgId = await getOrgIdForUser(req.user!.id);
+    const invoice = await Invoice.findOne({ _id: req.params.id, orgId }).populate("clientId");
+    if (!invoice) return next(new AppError("Invoice not found", 404));
+
+    const org = await Organization.findById(orgId);
+    const client = invoice.clientId;
+
+    const filename = `invoice-${invoice.invoiceNumber || invoice._id.toString().slice(-6)}.pdf`;
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `inline; filename="${filename}"`);
+
+    generateInvoicePdf(invoice, client, org, res);
+  } catch (err) {
+    next(err);
+  }
 };

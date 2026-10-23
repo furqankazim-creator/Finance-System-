@@ -16,11 +16,27 @@ export const comparePassword = async (
 ): Promise<boolean> => bcrypt.compare(password, hashedPassword);
 
 export const signToken = (user: IUser): string => {
-  return jwt.sign({ id: user.id, email: user.email }, JWT_SECRET, {
-    expiresIn: JWT_EXPIRES_IN,
-  } as jwt.SignOptions);
+  return jwt.sign(
+    {
+      id: user.id,
+      email: user.email,
+      role: user.role || "admin",
+      organizationId: user.organizationId ? String(user.organizationId) : undefined,
+    },
+    JWT_SECRET,
+    {
+      expiresIn: JWT_EXPIRES_IN,
+    } as jwt.SignOptions
+  );
 };
 
-export const verifyToken = (token: string): { id: string; email: string } => {
-  return jwt.verify(token, JWT_SECRET) as { id: string; email: string };
+export const verifyToken = (
+  token: string
+): { id: string; email: string; role?: string; organizationId?: string } => {
+  return jwt.verify(token, JWT_SECRET) as {
+    id: string;
+    email: string;
+    role?: string;
+    organizationId?: string;
+  };
 };

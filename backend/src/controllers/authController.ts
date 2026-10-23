@@ -56,6 +56,7 @@ export const signUp = async (
           id: user.id,
           fullName: user.fullName,
           email: user.email,
+          role: user.role || "admin",
         },
         token,
       },
@@ -92,6 +93,7 @@ export const signIn = async (
           id: user.id,
           fullName: user.fullName,
           email: user.email,
+          role: user.role || "admin",
         },
         token,
       },
@@ -216,6 +218,7 @@ export const getMe = async (
           id: user.id,
           fullName: user.fullName,
           email: user.email,
+          role: user.role || "admin",
         },
       },
     });
