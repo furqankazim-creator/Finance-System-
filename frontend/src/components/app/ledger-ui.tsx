@@ -122,10 +122,12 @@ export function LedgerCard({
       style={style}
       onClick={onClick}
       className={cn(
-        'relative overflow-hidden rounded-2xl border border-slate-200/90 bg-white p-5 shadow-[0_1px_3px_0_rgba(15,23,42,0.06),0_1px_2px_-1px_rgba(15,23,42,0.04)] ring-1 ring-slate-900/[0.04] transition-all duration-200 hover:border-slate-300 hover:shadow-[0_4px_14px_-2px_rgba(15,23,42,0.08),0_2px_6px_-1px_rgba(15,23,42,0.04)] dark:border-slate-800 dark:bg-slate-900/95 dark:shadow-[0_4px_20px_rgba(0,0,0,0.35)] dark:ring-white/[0.06] dark:hover:border-slate-700',
+        'group relative overflow-hidden rounded-2xl border border-slate-200/90 bg-gradient-to-b from-white via-white to-slate-50/60 p-5 shadow-[0_1px_2px_rgba(15,23,42,0.04),0_6px_20px_-4px_rgba(15,23,42,0.05)] ring-1 ring-slate-900/[0.04] transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[0_4px_8px_-1px_rgba(15,23,42,0.06),0_14px_30px_-6px_rgba(15,23,42,0.09)] dark:border-slate-800/90 dark:bg-gradient-to-b dark:from-slate-900/95 dark:via-slate-900/90 dark:to-slate-950/95 dark:shadow-[0_4px_24px_rgba(0,0,0,0.4)] dark:ring-white/[0.05] dark:hover:border-slate-700/90',
         className
       )}
     >
+      {/* Top subtle specular reflection line */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/80 to-transparent dark:via-white/[0.12]" />
       {children}
     </div>
   );
@@ -193,47 +195,53 @@ export function LedgerStatCard({
 }) {
   const cardGradientClass =
     noteTone === 'positive'
-      ? 'bg-gradient-to-b from-emerald-500/[0.04] via-white to-white dark:from-emerald-500/[0.08] dark:via-slate-900 dark:to-slate-900'
+      ? 'bg-gradient-to-br from-emerald-500/[0.06] via-white to-slate-50/70 before:bg-emerald-400/20 dark:from-emerald-500/[0.12] dark:via-slate-900/95 dark:to-slate-950 dark:before:bg-emerald-500/15'
       : noteTone === 'negative'
-        ? 'bg-gradient-to-b from-rose-500/[0.04] via-white to-white dark:from-rose-500/[0.08] dark:via-slate-900 dark:to-slate-900'
-        : 'bg-gradient-to-b from-slate-100/70 via-white to-white dark:from-slate-800/50 dark:via-slate-900 dark:to-slate-900';
+        ? 'bg-gradient-to-br from-rose-500/[0.06] via-white to-slate-50/70 before:bg-rose-400/20 dark:from-rose-500/[0.12] dark:via-slate-900/95 dark:to-slate-950 dark:before:bg-rose-500/15'
+        : 'bg-gradient-to-br from-slate-100/90 via-white to-slate-50/70 before:bg-slate-300/30 dark:from-slate-800/60 dark:via-slate-900/95 dark:to-slate-950 dark:before:bg-slate-700/20';
 
   const noteBadgeClass =
     noteTone === 'positive'
-      ? 'bg-emerald-50 text-emerald-800 border-emerald-200/90 dark:bg-emerald-950/70 dark:text-emerald-300 dark:border-emerald-800/70'
+      ? 'bg-emerald-50/90 text-emerald-800 border-emerald-200/90 shadow-sm shadow-emerald-500/10 dark:bg-emerald-950/70 dark:text-emerald-300 dark:border-emerald-800/70'
       : noteTone === 'negative'
-        ? 'bg-rose-50 text-rose-800 border-rose-200/90 dark:bg-rose-950/70 dark:text-rose-300 dark:border-rose-800/70'
-        : 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700';
+        ? 'bg-rose-50/90 text-rose-800 border-rose-200/90 shadow-sm shadow-rose-500/10 dark:bg-rose-950/70 dark:text-rose-300 dark:border-rose-800/70'
+        : 'bg-slate-100/90 text-slate-700 border-slate-200/90 shadow-sm dark:bg-slate-800/90 dark:text-slate-300 dark:border-slate-700';
 
   const toneAccentClass =
     noteTone === 'positive'
-      ? 'bg-gradient-to-r from-emerald-500 to-teal-400'
+      ? 'bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-600'
       : noteTone === 'negative'
-        ? 'bg-gradient-to-r from-rose-500 to-amber-500'
-        : 'bg-gradient-to-r from-slate-300 to-slate-400 dark:from-slate-700 dark:to-slate-600';
+        ? 'bg-gradient-to-r from-rose-500 via-amber-500 to-rose-600'
+        : 'bg-gradient-to-r from-slate-300 via-slate-400 to-slate-300 dark:from-slate-700 dark:via-slate-600 dark:to-slate-700';
 
   return (
     <div
       className={cn(
-        'group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-200/90 p-5 shadow-[0_1px_3px_0_rgba(15,23,42,0.06),0_1px_2px_-1px_rgba(15,23,42,0.04)] ring-1 ring-slate-900/[0.04] transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[0_6px_16px_-2px_rgba(15,23,42,0.08),0_3px_6px_-1px_rgba(15,23,42,0.04)] dark:border-slate-800 dark:shadow-[0_4px_20px_rgba(0,0,0,0.35)] dark:ring-white/[0.06] dark:hover:border-slate-700',
+        'group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-200/90 p-5 shadow-[0_1px_3px_rgba(15,23,42,0.04),0_8px_24px_-4px_rgba(15,23,42,0.06)] ring-1 ring-slate-900/[0.04] transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[0_4px_8px_-1px_rgba(15,23,42,0.06),0_16px_32px_-6px_rgba(15,23,42,0.1)] dark:border-slate-800/90 dark:shadow-[0_8px_30px_rgba(0,0,0,0.45)] dark:ring-white/[0.06] dark:hover:border-slate-700',
         cardGradientClass
       )}
     >
+      {/* Radial soft ambient glow in the top-right corner */}
+      <div className="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full blur-2xl opacity-60 group-hover:opacity-100 transition-opacity" />
+
+      {/* Top subtle specular reflection line */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/90 to-transparent dark:via-white/[0.15]" />
+
       {/* Precision micro-accent line at the top */}
       <div className={cn('absolute inset-x-0 top-0 h-1 opacity-90 transition-opacity group-hover:opacity-100', toneAccentClass)} />
 
-      <div>
+      <div className="relative z-10">
         <div className="flex items-center justify-between">
           <p className="text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
             {label}
           </p>
         </div>
-        <p className="mt-2 text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white tabular-nums lg:text-[28px]">
+        <p className="mt-2 text-2xl font-extrabold tracking-tight text-slate-900 dark:text-white tabular-nums lg:text-[28px] drop-shadow-[0_1px_1px_rgba(0,0,0,0.03)] dark:drop-shadow-none">
           {value}
         </p>
       </div>
 
-      <div className="mt-3 flex items-center">
+      <div className="relative z-10 mt-3 flex items-center">
         <span
           className={cn(
             'inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-0.5 text-[11px] font-semibold tracking-wide',
