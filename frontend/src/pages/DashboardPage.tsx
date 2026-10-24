@@ -225,7 +225,7 @@ export default function DashboardPage() {
       {error && <LedgerFormError>{error}</LedgerFormError>}
 
       {loading || !stats || !breakdown ? (
-        <p className="text-[12px] text-[#8b8f85]">Loading dashboard…</p>
+        <p className="text-xs text-slate-500 dark:text-slate-400">Loading dashboard…</p>
       ) : (
         <>
           <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
@@ -493,7 +493,7 @@ export default function DashboardPage() {
                 />
               </LedgerField>
               {categories.length === 0 && (
-                <p className="text-[11px] text-[#8b8f85]">Add a category first before logging an expense.</p>
+                <p className="text-xs text-amber-600 dark:text-amber-400">Add a category first before logging an expense.</p>
               )}
             </>
           ) : (
@@ -507,7 +507,7 @@ export default function DashboardPage() {
                 />
               </LedgerField>
               {clients.length === 0 && (
-                <p className="text-[11px] text-[#8b8f85]">Add a client first before creating an invoice.</p>
+                <p className="text-xs text-amber-600 dark:text-amber-400">Add a client first before creating an invoice.</p>
               )}
               <div className="grid grid-cols-2 gap-3">
                 <LedgerField label="Issue date">

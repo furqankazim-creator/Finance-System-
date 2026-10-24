@@ -155,7 +155,7 @@ export default function ChartOfAccountsPage() {
       {error && <LedgerFormError>{error}</LedgerFormError>}
 
       {loading ? (
-        <p className="text-[12px] text-[#8b8f85]">Loading chart of accounts…</p>
+        <p className="text-xs text-slate-500 dark:text-slate-400">Loading chart of accounts…</p>
       ) : (
         typeSections.map((section) => (
           <section key={section.type} className="rounded-[10px] border border-[#d8d2c7] bg-[#fbfaf6]">

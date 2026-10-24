@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import {
   LedgerBadge,
   LedgerButton,
+  LedgerCard,
   LedgerCell,
   LedgerEmptyRow,
   LedgerField,
@@ -85,7 +86,7 @@ export default function PayablesReceivablesPage() {
       {error && <LedgerFormError>{error}</LedgerFormError>}
 
       {loading || !data ? (
-        <p className="text-[12px] text-[#8b8f85]">Loading…</p>
+        <p className="text-xs text-slate-500 dark:text-slate-400">Loading…</p>
       ) : (
         <>
           <section className="grid gap-3 md:grid-cols-3">
@@ -94,7 +95,7 @@ export default function PayablesReceivablesPage() {
             <LedgerStatCard label="Salary dues" value={formatCents(data.payables.salaryDuesTotalCents)} note="Pending payroll" noteTone="negative" />
           </section>
 
-          <section className="rounded-[10px] border border-[#d8d2c7] bg-[#fbfaf6]">
+          <LedgerCard className="p-0">
             <LedgerSectionTitle>Receivables · unpaid invoices</LedgerSectionTitle>
             <LedgerTable headers={['Number', 'Client', 'Due', 'Status', 'Amount']} compact>
               {data.receivables.invoices.length === 0 ? (
@@ -108,14 +109,14 @@ export default function PayablesReceivablesPage() {
                     <LedgerCell>
                       <LedgerBadge tone={invoice.status === 'overdue' ? 'red' : 'yellow'}>{invoice.status}</LedgerBadge>
                     </LedgerCell>
-                    <LedgerCell className="font-semibold text-[#405048]">{formatCents(invoice.amountCents)}</LedgerCell>
+                    <LedgerCell className="font-bold text-slate-900 dark:text-white tabular-nums">{formatCents(invoice.amountCents)}</LedgerCell>
                   </LedgerRow>
                 ))
               )}
             </LedgerTable>
-          </section>
+          </LedgerCard>
 
-          <section className="rounded-[10px] border border-[#d8d2c7] bg-[#fbfaf6]">
+          <LedgerCard className="p-0">
             <LedgerSectionTitle>Payables · loans</LedgerSectionTitle>
             <LedgerTable headers={['Ref', 'Debtor', 'Date', 'Amount', 'Paid', 'Remaining', '']} compact>
               {data.payables.loans.length === 0 ? (
@@ -128,7 +129,7 @@ export default function PayablesReceivablesPage() {
                     <LedgerCell muted>{loan.date.slice(0, 10)}</LedgerCell>
                     <LedgerCell>{formatCents(loan.amountCents)}</LedgerCell>
                     <LedgerCell muted>{formatCents(loan.paidCents)}</LedgerCell>
-                    <LedgerCell className="font-semibold text-[#405048]">{formatCents(loan.amountCents - loan.paidCents)}</LedgerCell>
+                    <LedgerCell className="font-bold text-slate-900 dark:text-white tabular-nums">{formatCents(loan.amountCents - loan.paidCents)}</LedgerCell>
                     <LedgerCell className="text-right">
                       <LedgerRowAction onClick={() => openPayLoan(loan)}>Record payment</LedgerRowAction>
                     </LedgerCell>
@@ -136,9 +137,9 @@ export default function PayablesReceivablesPage() {
                 ))
               )}
             </LedgerTable>
-          </section>
+          </LedgerCard>
 
-          <section className="rounded-[10px] border border-[#d8d2c7] bg-[#fbfaf6]">
+          <LedgerCard className="p-0">
             <LedgerSectionTitle>Payables · salary dues</LedgerSectionTitle>
             <LedgerTable headers={['Employee', 'Role', 'Period', 'Net']} compact>
               {data.payables.salaryDues.length === 0 ? (
@@ -149,12 +150,12 @@ export default function PayablesReceivablesPage() {
                     <LedgerCell strong>{p.employeeName}</LedgerCell>
                     <LedgerCell muted>{p.role || '—'}</LedgerCell>
                     <LedgerCell muted>{p.month}/{p.year}</LedgerCell>
-                    <LedgerCell className="font-semibold text-[#405048]">{formatCents(p.netCents)}</LedgerCell>
+                    <LedgerCell className="font-bold text-slate-900 dark:text-white tabular-nums">{formatCents(p.netCents)}</LedgerCell>
                   </LedgerRow>
                 ))
               )}
             </LedgerTable>
-          </section>
+          </LedgerCard>
         </>
       )}
 

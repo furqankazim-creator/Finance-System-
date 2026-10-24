@@ -166,7 +166,7 @@ export default function ExpensesPage() {
 
       {error && <LedgerFormError>{error}</LedgerFormError>}
       {!loading && categories.length === 0 && (
-        <p className="text-[12px] text-[#8b8f85]">Add a category first before logging an expense.</p>
+        <p className="text-xs text-slate-500 dark:text-slate-400">Add a category first before logging an expense.</p>
       )}
 
       <LedgerTable headers={['Date', 'Vendor', 'Category', 'Project', 'Amount', '']}>
@@ -181,7 +181,7 @@ export default function ExpensesPage() {
               <LedgerCell strong>{expense.vendor}</LedgerCell>
               <LedgerCell>{categoryLabel(expense.categoryId)}</LedgerCell>
               <LedgerCell muted>{projectLabel(expense.projectId)}</LedgerCell>
-              <LedgerCell className="font-semibold text-[#405048]">{formatCents(expense.amountCents)}</LedgerCell>
+              <LedgerCell className="font-bold text-slate-900 dark:text-white tabular-nums">{formatCents(expense.amountCents)}</LedgerCell>
               <LedgerCell className="text-right">
                 <div className="flex justify-end gap-3">
                   <LedgerRowAction onClick={() => openEdit(expense)}>Edit</LedgerRowAction>

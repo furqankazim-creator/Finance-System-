@@ -177,7 +177,7 @@ export default function PayrollPage() {
               <LedgerCell muted>{monthNames[payroll.month - 1]} {payroll.year}</LedgerCell>
               <LedgerCell>{formatCents(payroll.grossCents)}</LedgerCell>
               <LedgerCell muted>{formatCents(payroll.deductionsCents)}</LedgerCell>
-              <LedgerCell className="font-semibold text-[#405048]">{formatCents(payroll.netCents)}</LedgerCell>
+              <LedgerCell className="font-bold text-slate-900 dark:text-white tabular-nums">{formatCents(payroll.netCents)}</LedgerCell>
               <LedgerCell>
                 <LedgerBadge tone={payroll.status === 'paid' ? 'green' : 'yellow'}>{payroll.status}</LedgerBadge>
               </LedgerCell>

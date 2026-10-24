@@ -2,7 +2,6 @@ import { useEffect, useMemo, useState } from 'react';
 import {
   LedgerBadge,
   LedgerButton,
-  LedgerCard,
   LedgerCell,
   LedgerEmptyRow,
   LedgerField,
@@ -497,22 +496,53 @@ export default function BankStatementPage() {
 
       {accounts.length > 0 && (
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-          {accounts.map((a) => (
-            <LedgerCard
-              key={a._id}
-              className={`cursor-pointer p-4 ${accountFilter === a._id ? 'ring-1 ring-[#0d6847]' : ''}`}
-              onClick={() => setAccountFilter(accountFilter === a._id ? '' : a._id)}
-            >
-              <p className="text-[13px] font-medium text-[#1f352c]">{a.bankName}</p>
-              <p className="mt-0.5 text-[11px] text-[#7b8078]">
-                {a.accountNumberMasked} · {a.accountType}
-              </p>
-              <p className="mt-3 text-[18px] text-[#293d34]" style={{ fontFamily: "Georgia, serif" }}>
-                {formatCents(a.balanceCents, a.currency)}
-              </p>
-              <p className="mt-1 text-[10px] text-[#909388]">{a.transactionCount} entries</p>
-            </LedgerCard>
-          ))}
+          {accounts.map((a) => {
+            const isSelected = accountFilter === a._id;
+            return (
+              <div
+                key={a._id}
+                onClick={() => setAccountFilter(isSelected ? '' : a._id)}
+                className={`group relative cursor-pointer overflow-hidden rounded-2xl border p-4.5 transition-all duration-200 ${
+                  isSelected
+                    ? 'border-emerald-600 bg-emerald-50/40 ring-2 ring-emerald-600/30 shadow-md dark:border-emerald-500 dark:bg-emerald-950/30 dark:ring-emerald-500/30'
+                    : 'border-slate-200/90 bg-white hover:border-slate-300 hover:shadow-md dark:border-slate-800 dark:bg-slate-900/95 dark:hover:border-slate-700'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <p className="text-sm font-semibold tracking-tight text-slate-900 dark:text-white">
+                    {a.bankName}
+                  </p>
+                  <span
+                    className={`inline-flex rounded-md px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                      isSelected
+                        ? 'bg-emerald-600 text-white dark:bg-emerald-500'
+                        : 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300'
+                    }`}
+                  >
+                    {a.accountType}
+                  </span>
+                </div>
+                <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
+                  {a.accountNumberMasked}
+                </p>
+                <p className="mt-3 text-xl font-extrabold tracking-tight text-slate-900 dark:text-white tabular-nums">
+                  {formatCents(a.balanceCents, a.currency)}
+                </p>
+                <div className="mt-2.5 flex items-center justify-between border-t border-slate-100 pt-2 dark:border-slate-800/80">
+                  <span className="text-[11px] font-medium text-slate-400 dark:text-slate-500">
+                    {a.transactionCount} transactions
+                  </span>
+                  <span
+                    className={`text-[11px] font-semibold ${
+                      isSelected ? 'text-emerald-700 dark:text-emerald-400' : 'text-slate-400 hover:text-slate-600 dark:hover:text-slate-300'
+                    }`}
+                  >
+                    {isSelected ? '✓ Filter Active' : 'Filter by account'}
+                  </span>
+                </div>
+              </div>
+            );
+          })}
         </div>
       )}
 
@@ -702,12 +732,12 @@ export default function BankStatementPage() {
             <input
               type="file"
               accept={FILE_ACCEPT}
-              className="text-[12px] text-[#49544d]"
+              className="block w-full text-xs text-slate-500 file:mr-4 file:rounded-xl file:border-0 file:bg-slate-100 file:px-4 file:py-2 file:text-xs file:font-semibold file:text-slate-700 hover:file:bg-slate-200 dark:file:bg-slate-800 dark:file:text-slate-200 dark:hover:file:bg-slate-700 cursor-pointer"
               onChange={(e) => onFile(e.target.files?.[0])}
             />
           </LedgerField>
-          {parsingFile && <p className="text-[12px] text-[#6c726c]">Reading file…</p>}
-          {fileMessage && <p className="text-[12px] text-[#b07a2a]">{fileMessage}</p>}
+          {parsingFile && <p className="text-xs text-slate-500">Reading file…</p>}
+          {fileMessage && <p className="text-xs font-medium text-amber-600 dark:text-amber-400">{fileMessage}</p>}
           {!importFile && (
             <LedgerField label="…or paste CSV">
               <LedgerTextarea
@@ -719,7 +749,7 @@ export default function BankStatementPage() {
             </LedgerField>
           )}
           {(importText || importFile) && !parsingFile && (
-            <p className="text-[12px] text-[#6c726c]">
+            <p className="text-xs font-medium text-slate-600 dark:text-slate-400">
               {parsed.length} valid row{parsed.length === 1 ? '' : 's'} detected
               {parsed.length > 0 &&
                 ` · ${formatCents(
@@ -729,25 +759,25 @@ export default function BankStatementPage() {
             </p>
           )}
           {parsed.length > 0 && (
-            <div className="max-h-40 overflow-y-auto rounded-[8px] border border-[#e4ddd1] text-[11px]">
+            <div className="max-h-40 overflow-y-auto rounded-xl border border-slate-200 bg-slate-50/50 p-1 text-xs dark:border-slate-800 dark:bg-slate-900/60">
               {parsed.slice(0, 8).map((r, i) => (
-                <div key={i} className="flex justify-between gap-3 border-b border-[#eee9de] px-3 py-1.5 last:border-0">
-                  <span className="text-[#7b8078]">{r.date}</span>
-                  <span className="flex-1 truncate text-[#31443c]">{r.description}</span>
-                  <span className={r.direction === 'inflow' ? 'text-[#2c9a74]' : 'text-[#c26b6b]'}>
+                <div key={i} className="flex justify-between gap-3 border-b border-slate-200/60 px-3 py-1.5 last:border-0 dark:border-slate-800">
+                  <span className="text-slate-400 dark:text-slate-500">{r.date}</span>
+                  <span className="flex-1 truncate font-medium text-slate-800 dark:text-slate-200">{r.description}</span>
+                  <span className={`font-semibold tabular-nums ${r.direction === 'inflow' ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600 dark:text-rose-400'}`}>
                     {r.direction === 'inflow' ? '+' : '-'}
                     {r.amount.toLocaleString()}
                   </span>
                 </div>
               ))}
               {parsed.length > 8 && (
-                <p className="px-3 py-1.5 text-[#909388]">…and {parsed.length - 8} more</p>
+                <p className="px-3 py-1.5 text-[11px] text-slate-400">…and {parsed.length - 8} more</p>
               )}
             </div>
           )}
           {importFile && (
-            <label className="flex items-center gap-2 text-[12px] text-[#49544d]">
-              <input type="checkbox" checked={keepCopy} onChange={(e) => setKeepCopy(e.target.checked)} />
+            <label className="flex items-center gap-2 text-xs text-slate-700 dark:text-slate-300">
+              <input type="checkbox" checked={keepCopy} onChange={(e) => setKeepCopy(e.target.checked)} className="rounded border-slate-300 text-emerald-600 focus:ring-emerald-500 dark:border-slate-700 dark:bg-slate-800" />
               Keep a copy of {importFile.name} in Saved statement files
             </label>
           )}
@@ -770,8 +800,8 @@ export default function BankStatementPage() {
       {/* Saved files */}
       <div className="space-y-2">
         <div className="flex items-center justify-between">
-          <p className="text-[13px] font-medium text-[#1f352c]">Saved statement files</p>
-          <label className="cursor-pointer rounded-[7px] border border-[#d7d1c6] bg-[#fbfaf6] px-3 py-1.5 text-[12px] text-[#31443c] hover:bg-[#f1ece2]">
+          <p className="text-sm font-semibold text-slate-800 dark:text-white">Saved statement files</p>
+          <label className="cursor-pointer rounded-xl border border-slate-200 bg-white px-3.5 py-1.5 text-xs font-semibold text-slate-700 shadow-sm transition hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800">
             Upload file / image
             <input
               type="file"

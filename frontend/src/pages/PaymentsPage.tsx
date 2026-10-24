@@ -188,7 +188,7 @@ export default function PaymentsPage() {
               <LedgerCell muted>{p.invoiceId?.clientId?.name ?? '—'}</LedgerCell>
               <LedgerCell muted>{methodLabel(p.method)}</LedgerCell>
               <LedgerCell muted>{p.reference || '—'}</LedgerCell>
-              <LedgerCell className="font-semibold text-[#405048]">{formatCents(p.amountCents)}</LedgerCell>
+              <LedgerCell className="font-bold text-slate-900 dark:text-white tabular-nums">{formatCents(p.amountCents)}</LedgerCell>
               <LedgerCell>
                 <LedgerBadge tone={p.invoiceId?.status === 'paid' ? 'green' : 'yellow'}>
                   {p.invoiceId?.status === 'paid' ? 'paid in full' : 'partial'}

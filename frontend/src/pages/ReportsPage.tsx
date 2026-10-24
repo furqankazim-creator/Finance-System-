@@ -369,27 +369,24 @@ export default function ReportsPage() {
       {activeTab === 'executive' && (
         <>
           {execLoading || !execData ? (
-            <p className="py-8 text-center text-[13px] text-[#8b8f85]">
+            <p className="py-8 text-center text-xs text-slate-500 dark:text-slate-400">
               Compiling executive partner summary…
             </p>
           ) : (
             <div className="space-y-5">
               {/* Executive Header Banner */}
-              <div className="rounded-[10px] border border-[#d8d2c7] bg-[#fbfaf6] p-5">
+              <div className="rounded-2xl border border-slate-200/90 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900/95">
                 <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                   <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#8b8f85]">
+                    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-emerald-700 dark:text-emerald-400">
                       CONFIDENTIAL PARTNER BRIEFING · {execData.periodType.toUpperCase()}
                     </p>
-                    <h2
-                      className="mt-1 text-[22px] leading-tight text-[#1f352c]"
-                      style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}
-                    >
+                    <h2 className="mt-1 text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
                       {execData.orgName}
                     </h2>
-                    <p className="mt-1 text-[13px] text-[#6c726c]">
+                    <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
                       Performance for {execData.periodLabel} · Currency:{' '}
-                      <span className="font-semibold text-[#1f352c]">{execData.currency}</span>
+                      <span className="font-semibold text-slate-800 dark:text-slate-200">{execData.currency}</span>
                     </p>
                   </div>
 
@@ -566,7 +563,7 @@ export default function ReportsPage() {
       {activeTab === 'pl' && (
         <>
           {plLoading || !plReport ? (
-            <p className="py-8 text-center text-[13px] text-[#8b8f85]">Loading P&L statement…</p>
+            <p className="py-8 text-center text-xs text-slate-500 dark:text-slate-400">Loading P&L statement…</p>
           ) : (
             <div className="space-y-5">
               <section className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">

@@ -122,7 +122,7 @@ export function LedgerCard({
       style={style}
       onClick={onClick}
       className={cn(
-        'relative overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-slate-100/80 ring-1 ring-slate-900/[0.03] transition-all duration-200 hover:border-slate-300 hover:shadow-md dark:border-slate-800/80 dark:bg-slate-900/90 dark:shadow-none dark:ring-white/[0.04] dark:hover:border-slate-700',
+        'relative overflow-hidden rounded-2xl border border-slate-200/90 bg-white p-5 shadow-[0_1px_3px_0_rgba(15,23,42,0.06),0_1px_2px_-1px_rgba(15,23,42,0.04)] ring-1 ring-slate-900/[0.04] transition-all duration-200 hover:border-slate-300 hover:shadow-[0_4px_14px_-2px_rgba(15,23,42,0.08),0_2px_6px_-1px_rgba(15,23,42,0.04)] dark:border-slate-800 dark:bg-slate-900/95 dark:shadow-[0_4px_20px_rgba(0,0,0,0.35)] dark:ring-white/[0.06] dark:hover:border-slate-700',
         className
       )}
     >
@@ -146,7 +146,7 @@ export function LedgerSelect({
     return (
       <div
         className={cn(
-          'min-w-[130px] rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-medium text-slate-700 shadow-sm dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200',
+          'min-w-[130px] rounded-xl border border-slate-300/85 bg-white px-3.5 py-2 text-xs font-semibold text-slate-800 shadow-sm dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200',
           className
         )}
       >
@@ -156,20 +156,27 @@ export function LedgerSelect({
   }
 
   return (
-    <select
-      value={value}
-      onChange={(e) => onChange?.(e.target.value)}
-      className={cn(
-        'min-w-[130px] cursor-pointer rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-medium text-slate-700 shadow-sm outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200 dark:focus:border-emerald-500',
-        className
-      )}
-    >
-      {options.map((option) => (
-        <option key={option.value} value={option.value} className="dark:bg-slate-900 dark:text-slate-100">
-          {option.label}
-        </option>
-      ))}
-    </select>
+    <div className="relative inline-block">
+      <select
+        value={value}
+        onChange={(e) => onChange?.(e.target.value)}
+        className={cn(
+          'min-w-[140px] cursor-pointer appearance-none rounded-xl border border-slate-300/85 bg-white py-2 pl-3.5 pr-8 text-xs font-semibold text-slate-800 shadow-sm outline-none transition hover:border-slate-400 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/15 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:border-slate-600 dark:focus:border-emerald-500',
+          className
+        )}
+      >
+        {options.map((option) => (
+          <option key={option.value} value={option.value} className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">
+            {option.label}
+          </option>
+        ))}
+      </select>
+      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2.5 text-slate-400 dark:text-slate-500">
+        <svg className="h-3.5 w-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </div>
+    </div>
   );
 }
 
@@ -184,24 +191,36 @@ export function LedgerStatCard({
   note: string;
   noteTone?: 'positive' | 'negative' | 'muted';
 }) {
+  const cardGradientClass =
+    noteTone === 'positive'
+      ? 'bg-gradient-to-b from-emerald-500/[0.04] via-white to-white dark:from-emerald-500/[0.08] dark:via-slate-900 dark:to-slate-900'
+      : noteTone === 'negative'
+        ? 'bg-gradient-to-b from-rose-500/[0.04] via-white to-white dark:from-rose-500/[0.08] dark:via-slate-900 dark:to-slate-900'
+        : 'bg-gradient-to-b from-slate-100/70 via-white to-white dark:from-slate-800/50 dark:via-slate-900 dark:to-slate-900';
+
   const noteBadgeClass =
     noteTone === 'positive'
-      ? 'bg-emerald-50 text-emerald-700 border-emerald-200/70 dark:bg-emerald-950/50 dark:text-emerald-400 dark:border-emerald-800/60'
+      ? 'bg-emerald-50 text-emerald-800 border-emerald-200/90 dark:bg-emerald-950/70 dark:text-emerald-300 dark:border-emerald-800/70'
       : noteTone === 'negative'
-        ? 'bg-rose-50 text-rose-700 border-rose-200/70 dark:bg-rose-950/50 dark:text-rose-400 dark:border-rose-800/60'
-        : 'bg-slate-50 text-slate-600 border-slate-200/70 dark:bg-slate-800/60 dark:text-slate-300 dark:border-slate-700/60';
+        ? 'bg-rose-50 text-rose-800 border-rose-200/90 dark:bg-rose-950/70 dark:text-rose-300 dark:border-rose-800/70'
+        : 'bg-slate-100 text-slate-700 border-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:border-slate-700';
 
   const toneAccentClass =
     noteTone === 'positive'
       ? 'bg-gradient-to-r from-emerald-500 to-teal-400'
       : noteTone === 'negative'
         ? 'bg-gradient-to-r from-rose-500 to-amber-500'
-        : 'bg-gradient-to-r from-slate-400 to-slate-500 dark:from-slate-600 dark:to-slate-700';
+        : 'bg-gradient-to-r from-slate-300 to-slate-400 dark:from-slate-700 dark:to-slate-600';
 
   return (
-    <div className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-200/80 bg-white p-5 shadow-sm shadow-slate-100/70 ring-1 ring-slate-900/[0.04] transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-md dark:border-slate-800/90 dark:bg-slate-900/90 dark:shadow-none dark:ring-white/[0.05] dark:hover:border-slate-700">
+    <div
+      className={cn(
+        'group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-slate-200/90 p-5 shadow-[0_1px_3px_0_rgba(15,23,42,0.06),0_1px_2px_-1px_rgba(15,23,42,0.04)] ring-1 ring-slate-900/[0.04] transition-all duration-200 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[0_6px_16px_-2px_rgba(15,23,42,0.08),0_3px_6px_-1px_rgba(15,23,42,0.04)] dark:border-slate-800 dark:shadow-[0_4px_20px_rgba(0,0,0,0.35)] dark:ring-white/[0.06] dark:hover:border-slate-700',
+        cardGradientClass
+      )}
+    >
       {/* Precision micro-accent line at the top */}
-      <div className={cn('absolute inset-x-0 top-0 h-1 opacity-80 transition-opacity group-hover:opacity-100', toneAccentClass)} />
+      <div className={cn('absolute inset-x-0 top-0 h-1 opacity-90 transition-opacity group-hover:opacity-100', toneAccentClass)} />
 
       <div>
         <div className="flex items-center justify-between">
@@ -217,12 +236,12 @@ export function LedgerStatCard({
       <div className="mt-3 flex items-center">
         <span
           className={cn(
-            'inline-flex items-center gap-1 rounded-lg border px-2.5 py-0.5 text-[11px] font-semibold tracking-wide',
+            'inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-0.5 text-[11px] font-semibold tracking-wide',
             noteBadgeClass
           )}
         >
-          {noteTone === 'positive' && <span>↑</span>}
-          {noteTone === 'negative' && <span>↓</span>}
+          {noteTone === 'positive' && <span className="font-bold">↑</span>}
+          {noteTone === 'negative' && <span className="font-bold">↓</span>}
           <span>{note}</span>
         </span>
       </div>
@@ -422,7 +441,7 @@ export function LedgerField({
 }
 
 const fieldClass =
-  'w-full rounded-xl border border-slate-200 bg-white px-3.5 py-2.5 text-xs text-slate-800 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-emerald-600 focus:ring-2 focus:ring-emerald-500/20 dark:border-slate-800 dark:bg-slate-800/80 dark:text-slate-100 dark:placeholder:text-slate-500 dark:focus:border-emerald-500';
+  'w-full rounded-xl border border-slate-300/85 bg-white px-3.5 py-2.5 text-sm font-normal text-slate-900 shadow-[0_1px_2px_rgba(0,0,0,0.03)] outline-none transition placeholder:text-slate-400 hover:border-slate-400 focus:border-emerald-600 focus:ring-4 focus:ring-emerald-600/15 focus:bg-white dark:border-slate-700/80 dark:bg-slate-950/70 dark:text-slate-100 dark:placeholder:text-slate-500 dark:hover:border-slate-600 dark:focus:border-emerald-500 dark:focus:ring-emerald-500/20 dark:focus:bg-slate-950';
 
 export function LedgerInput(props: InputHTMLAttributes<HTMLInputElement>) {
   const { className, ...rest } = props;
@@ -431,7 +450,7 @@ export function LedgerInput(props: InputHTMLAttributes<HTMLInputElement>) {
 
 export function LedgerTextarea(props: TextareaHTMLAttributes<HTMLTextAreaElement>) {
   const { className, ...rest } = props;
-  return <textarea {...rest} className={cn(fieldClass, 'min-h-[80px] resize-y', className)} />;
+  return <textarea {...rest} className={cn(fieldClass, 'min-h-[88px] resize-y leading-relaxed', className)} />;
 }
 
 export function LedgerFormSelect(
@@ -439,13 +458,27 @@ export function LedgerFormSelect(
 ) {
   const { className, options, ...rest } = props;
   return (
-    <select {...rest} className={cn(fieldClass, 'cursor-pointer', className)}>
-      {options.map((option) => (
-        <option key={option.value} value={option.value} className="dark:bg-slate-900 dark:text-slate-100">
-          {option.label}
-        </option>
-      ))}
-    </select>
+    <div className="relative">
+      <select
+        {...rest}
+        className={cn(
+          fieldClass,
+          'cursor-pointer appearance-none pr-9 text-slate-900 dark:text-slate-100',
+          className
+        )}
+      >
+        {options.map((option) => (
+          <option key={option.value} value={option.value} className="bg-white text-slate-900 dark:bg-slate-900 dark:text-slate-100">
+            {option.label}
+          </option>
+        ))}
+      </select>
+      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-3 text-slate-400 dark:text-slate-500">
+        <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </div>
+    </div>
   );
 }
 

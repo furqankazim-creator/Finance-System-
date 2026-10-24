@@ -252,14 +252,14 @@ export default function BookkeepingPage() {
                   </span>
                   <LedgerBadge tone={column.tone}>{bucket?.count ?? 0}</LedgerBadge>
                 </div>
-                <p className="mt-3 text-[11px] font-medium uppercase tracking-[0.08em] text-[#8b8f85]">
+                <p className="mt-3 text-[11px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
                   {column.label}
                 </p>
-                <p className="mt-0.5 text-[19px] leading-none text-[#20352d]" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
+                <p className="mt-0.5 text-xl font-extrabold tracking-tight text-slate-900 dark:text-white tabular-nums">
                   {formatCents(bucket?.totalCents ?? 0)}
                 </p>
               </button>
-              <div className="border-t border-[#ebe5da] px-4 py-2.5">
+              <div className="border-t border-slate-100 px-4 py-2.5 dark:border-slate-800">
                 <LedgerButton
                   className="w-full"
                   variant="secondary"
@@ -278,10 +278,10 @@ export default function BookkeepingPage() {
       </section>
 
       <div className="flex items-center justify-between">
-        <p className="text-[11px] text-[#787d75]">
+        <p className="text-xs text-slate-500 dark:text-slate-400">
           {filterColumn ? (
             <>
-              Showing <span className="font-semibold text-[#31443c]">{filterColumn.label}</span> ·{' '}
+              Showing <span className="font-semibold text-slate-900 dark:text-white">{filterColumn.label}</span> ·{' '}
               {visibleTransactions.length} {visibleTransactions.length === 1 ? 'entry' : 'entries'}
             </>
           ) : (
@@ -292,7 +292,7 @@ export default function BookkeepingPage() {
           <button
             type="button"
             onClick={() => setFilterType(null)}
-            className="inline-flex items-center gap-1 text-[11px] font-medium text-[#0d6847] hover:underline"
+            className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-600 hover:underline dark:text-emerald-400"
           >
             <X size={12} /> Clear filter
           </button>
@@ -353,7 +353,7 @@ export default function BookkeepingPage() {
         <form onSubmit={handleSubmit} className="space-y-4">
           {error && <LedgerFormError>{error}</LedgerFormError>}
           {activeAccounts.length === 0 ? (
-            <p className="text-[12px] text-[#8b8f85]">
+            <p className="text-xs text-amber-600 dark:text-amber-400">
               No active accounts of this type yet — add one on the Chart of Accounts page first.
             </p>
           ) : (

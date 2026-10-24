@@ -146,12 +146,12 @@ export default function CostingPage() {
       {error && <LedgerFormError>{error}</LedgerFormError>}
 
       {loading || !rate ? (
-        <p className="text-[12px] text-[#8b8f85]">Loading…</p>
+        <p className="text-xs text-slate-500 dark:text-slate-400">Loading…</p>
       ) : (
         <>
           <section className="grid gap-4 xl:grid-cols-[1fr_1.3fr]">
             <LedgerCard className="p-5">
-              <h2 className="text-[16px] font-normal text-[#243830]" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
+              <h2 className="text-base font-bold text-slate-900 dark:text-white">
                 Monthly fixed cost
               </h2>
               <form onSubmit={handleSettingsSubmit} className="mt-4 space-y-4">
@@ -165,14 +165,14 @@ export default function CostingPage() {
                   />
                 </LedgerField>
                 {rate.recordedOverheadCents > 0 && (
-                  <div className="flex items-center justify-between rounded-[7px] bg-[#f3f0e6] px-3 py-2 text-[11px] text-[#6c726c]">
+                  <div className="flex items-center justify-between rounded-xl bg-slate-50 px-3 py-2 text-xs text-slate-600 dark:bg-slate-800/80 dark:text-slate-300">
                     <span>
                       Recorded in Bookkeeping this month (expense-type transactions): {' '}
-                      <span className="font-semibold text-[#31443c]">{formatCents(rate.recordedOverheadCents)}</span>
+                      <span className="font-semibold text-slate-900 dark:text-white">{formatCents(rate.recordedOverheadCents)}</span>
                     </span>
                     <button
                       type="button"
-                      className="ml-2 shrink-0 font-medium text-[#0d6847] hover:underline"
+                      className="ml-2 shrink-0 font-semibold text-emerald-600 hover:underline dark:text-emerald-400"
                       onClick={() => setSettingsForm({ ...settingsForm, monthlyOverhead: (rate.recordedOverheadCents / 100).toString() })}
                     >
                       Use this
@@ -206,30 +206,30 @@ export default function CostingPage() {
             </LedgerCard>
 
             <LedgerCard className="p-5">
-              <h2 className="text-[16px] font-normal text-[#243830]" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
+              <h2 className="text-base font-bold text-slate-900 dark:text-white">
                 Computed rate — this month
               </h2>
-              <div className="mt-4 space-y-3 text-[13px]">
-                <div className="flex justify-between text-[#46534c]">
+              <div className="mt-4 space-y-3 text-xs">
+                <div className="flex justify-between text-slate-600 dark:text-slate-400">
                   <span>Monthly overhead</span>
-                  <span className="font-semibold">{formatCents(rate.settings.monthlyOverheadCents)}</span>
+                  <span className="font-semibold text-slate-900 dark:text-slate-100">{formatCents(rate.settings.monthlyOverheadCents)}</span>
                 </div>
-                <div className="flex justify-between text-[#46534c]">
+                <div className="flex justify-between text-slate-600 dark:text-slate-400">
                   <span>Monthly payroll cost (gross, this month)</span>
-                  <span className="font-semibold">{formatCents(rate.monthlyPayrollCostCents)}</span>
+                  <span className="font-semibold text-slate-900 dark:text-slate-100">{formatCents(rate.monthlyPayrollCostCents)}</span>
                 </div>
-                <div className="flex justify-between text-[#46534c]">
+                <div className="flex justify-between text-slate-600 dark:text-slate-400">
                   <span>Total monthly fixed cost</span>
-                  <span className="font-semibold">{formatCents(rate.totalMonthlyCostCents)}</span>
+                  <span className="font-semibold text-slate-900 dark:text-slate-100">{formatCents(rate.totalMonthlyCostCents)}</span>
                 </div>
-                <div className="flex justify-between text-[#46534c]">
+                <div className="flex justify-between text-slate-600 dark:text-slate-400">
                   <span>Monthly capacity hours</span>
-                  <span className="font-semibold">{rate.settings.monthlyCapacityHours}</span>
+                  <span className="font-semibold text-slate-900 dark:text-slate-100">{rate.settings.monthlyCapacityHours}</span>
                 </div>
-                <div className="mt-2 rounded-[8px] bg-[#eef3ee] px-3 py-2.5">
-                  <div className="flex justify-between text-[15px] text-[#1f352c]">
+                <div className="mt-2 rounded-xl border border-emerald-200/60 bg-emerald-50/50 px-3.5 py-3 dark:border-emerald-900/60 dark:bg-emerald-950/40">
+                  <div className="flex justify-between text-sm text-slate-900 dark:text-white">
                     <span className="font-medium">Per-hour cost</span>
-                    <span className="font-semibold">{formatCents(rate.perHourCostCents)} / hr</span>
+                    <span className="font-bold text-emerald-700 dark:text-emerald-400">{formatCents(rate.perHourCostCents)} / hr</span>
                   </div>
                 </div>
               </div>
@@ -238,20 +238,20 @@ export default function CostingPage() {
 
           <section>
             <div className="mb-2 flex items-baseline justify-between">
-              <p className="text-[11px] text-[#72776f]">
+              <p className="text-xs text-slate-500 dark:text-slate-400">
                 Where did we spend our hours? — total spend this month ÷ total office hours = per-hour cost (above).
               </p>
-              <p className="text-[11px] text-[#72776f]">This month</p>
+              <p className="text-xs text-slate-400">This month</p>
             </div>
 
             {rate.costByProject.length === 0 ? (
-              <p className="rounded-[10px] border border-[#d8d2c7] bg-[#fbfaf6] p-5 text-[12px] text-[#8b8f85]">
+              <LedgerCard className="p-6 text-center text-xs text-slate-500 dark:text-slate-400">
                 No expenses logged against a project yet this month.
-              </p>
+              </LedgerCard>
             ) : (
               <div className="grid gap-4 md:grid-cols-2">
                 <LedgerCard className="p-5">
-                  <h2 className="text-[15px] font-normal text-[#243830]" style={{ fontFamily: "Georgia, 'Times New Roman', serif" }}>
+                  <h2 className="text-base font-bold text-slate-900 dark:text-white">
                     Monthly cost by project
                   </h2>
                   <div className="mt-3 h-[220px]">
@@ -379,10 +379,10 @@ export default function CostingPage() {
               const baseCentsPreview = Math.round(hours * rate.perHourCostCents);
               const finalCentsPreview = Math.round(baseCentsPreview * (1 + margin / 100));
               return (
-                <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-1 rounded-[8px] bg-[#eef3ee] px-3 py-2.5 text-[12px] text-[#1f352c]">
-                  <span className="text-[10px] font-semibold uppercase tracking-[0.1em] text-[#5c8871]">Live preview</span>
-                  <span>{hours} hrs × {formatCents(rate.perHourCostCents)}/hr = <span className="font-semibold">{formatCents(baseCentsPreview)}</span> base</span>
-                  <span>+ {margin}% margin → <span className="font-semibold">{formatCents(finalCentsPreview)}</span> final bid</span>
+                <div className="mt-4 flex flex-wrap items-center gap-x-6 gap-y-1 rounded-xl border border-emerald-200/70 bg-emerald-50/50 px-3.5 py-2.5 text-xs text-slate-800 dark:border-emerald-900/60 dark:bg-emerald-950/40 dark:text-slate-200">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-700 dark:text-emerald-400">Live preview</span>
+                  <span>{hours} hrs × {formatCents(rate.perHourCostCents)}/hr = <span className="font-bold text-slate-900 dark:text-white">{formatCents(baseCentsPreview)}</span> base</span>
+                  <span>+ {margin}% margin → <span className="font-bold text-emerald-700 dark:text-emerald-400">{formatCents(finalCentsPreview)}</span> final bid</span>
                 </div>
               );
             })()}
@@ -399,7 +399,7 @@ export default function CostingPage() {
                   <LedgerCell muted>{formatCents(estimate.hourlyCostCentsUsed)}/hr</LedgerCell>
                   <LedgerCell muted>{formatCents(estimate.baseCostCents)}</LedgerCell>
                   <LedgerCell muted>{estimate.profitMarginPct}%</LedgerCell>
-                  <LedgerCell className="font-semibold text-[#405048]">{formatCents(estimate.finalBidCostCents)}</LedgerCell>
+                  <LedgerCell className="font-bold text-slate-900 dark:text-white tabular-nums">{formatCents(estimate.finalBidCostCents)}</LedgerCell>
                   <LedgerCell className="text-right">
                     <LedgerRowAction tone="danger" onClick={() => handleDeleteEstimate(estimate)}>
                       Delete

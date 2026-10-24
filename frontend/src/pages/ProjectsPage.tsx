@@ -190,14 +190,14 @@ export default function ProjectsPage() {
 
       {error && <LedgerFormError>{error}</LedgerFormError>}
       {!loading && clients.length === 0 && (
-        <p className="text-[12px] text-[#8b8f85]">Add a client first before creating a project.</p>
+        <p className="text-xs text-slate-500 dark:text-slate-400">Add a client first before creating a project.</p>
       )}
 
       <section className="grid gap-4 md:grid-cols-2">
         {loading ? (
-          <p className="text-[12px] text-[#8b8f85]">Loading projects…</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">Loading projects…</p>
         ) : projects.length === 0 ? (
-          <p className="text-[12px] text-[#8b8f85]">No projects yet. Add your first one.</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400">No projects yet. Add your first one.</p>
         ) : (
           projects.map((project) => {
             const spentCents = spentCentsFor(project._id);

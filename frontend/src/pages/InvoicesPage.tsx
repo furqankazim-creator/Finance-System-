@@ -247,7 +247,7 @@ export default function InvoicesPage() {
 
       {error && <LedgerFormError>{error}</LedgerFormError>}
       {!loading && clients.length === 0 && (
-        <p className="text-[12px] text-[#8b8f85]">Add a client first before creating an invoice.</p>
+        <p className="text-xs text-slate-500 dark:text-slate-400">Add a client first before creating an invoice.</p>
       )}
 
       <LedgerTable headers={['Number', 'Client', 'Project', 'Issued', 'Due', 'Status', 'Amount', '']}>
@@ -266,7 +266,7 @@ export default function InvoicesPage() {
               <LedgerCell>
                 <LedgerBadge tone={badgeTone(invoice.status)}>{invoice.status}</LedgerBadge>
               </LedgerCell>
-              <LedgerCell className="font-semibold text-[#405048]">{formatCents(invoice.amountCents)}</LedgerCell>
+              <LedgerCell className="font-bold text-slate-900 dark:text-white tabular-nums">{formatCents(invoice.amountCents)}</LedgerCell>
               <LedgerCell className="text-right">
                 <div className="flex justify-end gap-2.5">
                   <LedgerRowAction onClick={() => downloadPdf(invoice)}>PDF</LedgerRowAction>
