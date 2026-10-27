@@ -38,7 +38,34 @@ export default function LoginPage() {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="mt-8 space-y-4">
+        {/* Demo Credentials Pill */}
+        <div className="mt-6 rounded-2xl border border-emerald-200/90 bg-emerald-50/70 p-3.5 text-xs shadow-sm dark:border-emerald-900/60 dark:bg-emerald-950/40">
+          <div className="flex items-center justify-between gap-3">
+            <div>
+              <p className="font-bold text-emerald-950 dark:text-emerald-300">⚡ Demo Credentials</p>
+              <div className="mt-1 space-y-0.5 text-slate-600 dark:text-slate-400">
+                <p>
+                  Email: <span className="font-mono font-bold text-slate-900 dark:text-white">demo@gmail.com</span>
+                </p>
+                <p>
+                  Password: <span className="font-mono font-bold text-slate-900 dark:text-white">demo1234</span>
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => {
+                setEmail('demo@gmail.com');
+                setPassword('demo1234');
+              }}
+              className="shrink-0 rounded-xl bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white shadow-sm transition hover:bg-emerald-700 active:scale-95 dark:bg-emerald-500"
+            >
+              Autofill
+            </button>
+          </div>
+        </div>
+
+        <form onSubmit={handleSubmit} className="mt-6 space-y-4">
           {error && (
             <div className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-xs font-medium text-rose-700 dark:border-rose-900/60 dark:bg-rose-950/40 dark:text-rose-400">
               {error}
